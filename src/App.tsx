@@ -122,9 +122,9 @@ export default function App() {
             <span>沉浸式专注工作台</span>
           </div>
           <div className="top-stats" aria-label="今日概览">
-            <span>今日 {todayStats.pomodoros} 轮</span>
-            <span>{todayStats.minutes} 分钟</span>
-            <span>{todayStats.doneTasks} 项完成</span>
+            <span><b>{todayStats.pomodoros}</b> 轮</span>
+            <span><b>{todayStats.minutes}</b> 分钟</span>
+            <span><b>{todayStats.doneTasks}</b> 项完成</span>
           </div>
           <nav className="toolbar" aria-label="全局操作">
             <button className="icon-button" onClick={() => openModal('analytics')} aria-label="打开数据统计" title="数据统计"><BarChart3 size={18} /><span>统计</span></button>
@@ -160,6 +160,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

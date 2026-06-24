@@ -72,16 +72,27 @@ function TaskItem({ task, index, total, selected, locked }: { task: TodayTask; i
   );
 }
 
-function TaskSection({ title, tasks, currentTaskId, locked }: { title: string; tasks: TodayTask[]; currentTaskId: string | null; locked: boolean }) {
+function TaskSection({ title, tasks, currentTaskId, locked, collapsible = false }: { title: string; tasks: TodayTask[]; currentTaskId: string | null; locked: boolean; collapsible?: boolean }) {
+  const [open, setOpen] = useState(!collapsible);
   if (!tasks.length) return null;
+
   return (
-    <div className="task-section">
-      <h3>{title}</h3>
-      <div className="space-y-2">
-        {tasks.map((task, index) => (
-          <TaskItem key={task.id} task={task} index={index} total={tasks.length} selected={task.id === currentTaskId} locked={locked} />
-        ))}
-      </div>
+    <div className={`task-section ${collapsible ? 'collapsible' : ''}`}>
+      {collapsible ? (
+        <button className="task-section-toggle" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
+          <span>{title}<small>{tasks.length}</small></span>
+          <ChevronDown size={16} className={open ? 'rotate-180' : ''} />
+        </button>
+      ) : (
+        <h3>{title}<small>{tasks.length}</small></h3>
+      )}
+      {open && (
+        <div className="space-y-2">
+          {tasks.map((task, index) => (
+            <TaskItem key={task.id} task={task} index={index} total={tasks.length} selected={task.id === currentTaskId} locked={locked} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -114,7 +125,7 @@ export function TaskList() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <div id="task-list-title" className="panel-title"><Flag size={18} />当前任务列表</div>
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">{doneTasks.length}/{tasks.length} 已完成 · 今日历史 {effectiveTodayRecords.length} 轮。</p>
+          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">{doneTasks.length}/{tasks.length} 已完成 · 今日有效 {effectiveTodayRecords.length} 轮。</p>
         </div>
       </div>
 
@@ -145,11 +156,12 @@ export function TaskList() {
       </div>
 
       <div className="mt-4 space-y-4">
-        {!tasks.length && <div className="empty-state py-6">{todayRecords.length ? '当前任务列表为空；今日历史专注记录已保留在复盘区。添加任务后才能开始新一轮专注。' : '添加第一个今日任务后，才能开始专注。'}</div>}
+        {!tasks.length && <div className="empty-state py-6">{todayRecords.length ? '当前任务列表为空；今日专注记录已保留在复盘区。添加任务后才能开始新一轮专注。' : '添加第一个今日任务后，才能开始专注。'}</div>}
         <TaskSection title="正在进行" tasks={activeTask} currentTaskId={currentTaskId} locked={isLocked} />
         <TaskSection title="待开始" tasks={todoTasks} currentTaskId={currentTaskId} locked={isLocked} />
-        <TaskSection title="已完成" tasks={doneTasks} currentTaskId={currentTaskId} locked={isLocked} />
+        <TaskSection title="已完成" tasks={doneTasks} currentTaskId={currentTaskId} locked={isLocked} collapsible />
       </div>
     </section>
   );
 }
+
