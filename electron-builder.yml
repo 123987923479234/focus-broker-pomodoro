@@ -1,0 +1,30 @@
+appId: com.codex.luxury-pomodoro-agent
+productName: 超豪华版番茄钟
+directories:
+  output: release
+files:
+  - dist/**
+  - electron/**
+  - package.json
+asar: true
+compression: normal
+npmRebuild: false
+buildDependenciesFromSource: false
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 超豪华版番茄钟
+portable:
+  artifactName: ${productName}-便携版-${version}-${arch}.${ext}

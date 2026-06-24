@@ -1,0 +1,155 @@
+import { CheckCircle2, ChevronDown, ChevronUp, Circle, Flag, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { categoryLabel, difficultyLabel } from '../lib/format';
+import { isEffectivePomodoro } from '../lib/pomodoroRules';
+import { usePomodoroStore } from '../store/usePomodoroStore';
+import type { Difficulty, TaskCategory, TodayTask } from '../types/pomodoro';
+
+const categories: Array<{ value: TaskCategory; label: string }> = [
+  { value: 'coding', label: '编码' },
+  { value: 'writing', label: '写作' },
+  { value: 'learning', label: '学习' },
+  { value: 'planning', label: '规划' },
+  { value: 'research', label: '研究' },
+  { value: 'other', label: '其他' },
+];
+
+const difficulties: Array<{ value: Difficulty; label: string }> = [
+  { value: 'simple', label: '简单' },
+  { value: 'medium', label: '中等' },
+  { value: 'hard', label: '困难' },
+];
+
+function taskProgress(task: TodayTask) {
+  return Math.min(100, Math.round((task.completedPomodoros / Math.max(1, task.estimatePomodoros)) * 100));
+}
+
+function TaskItem({ task, index, total, selected, locked }: { task: TodayTask; index: number; total: number; selected: boolean; locked: boolean }) {
+  const selectTask = usePomodoroStore((state) => state.selectTask);
+  const updateTask = usePomodoroStore((state) => state.updateTask);
+  const deleteTask = usePomodoroStore((state) => state.deleteTask);
+  const markTaskDone = usePomodoroStore((state) => state.markTaskDone);
+  const reorderTask = usePomodoroStore((state) => state.reorderTask);
+  const [editing, setEditing] = useState(false);
+
+  const confirmDelete = () => {
+    if (window.confirm('删除任务只会移出当前任务列表，历史专注记录会保留用于统计。是否继续？')) {
+      deleteTask(task.id);
+    }
+  };
+
+  return (
+    <article className={`task-card ${selected ? 'active' : ''} ${task.status === 'done' ? 'done' : ''}`}>
+      <div className="flex items-start gap-2">
+        <button className="task-main" onClick={() => !locked && task.status !== 'done' && selectTask(task.id)} disabled={locked || task.status === 'done'}>
+          {task.status === 'done' ? <CheckCircle2 size={18} /> : selected ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+          <span className="min-w-0">
+            <strong>{task.name}</strong>
+            <small>{task.completedPomodoros}/{task.estimatePomodoros} 番茄 · {categoryLabel(task.category)} · {difficultyLabel(task.difficulty)}</small>
+          </span>
+        </button>
+        <span className="task-state">{task.status === 'done' ? '已完成' : selected ? '当前' : '待开始'}</span>
+      </div>
+
+      <div className="task-progress" aria-label={`任务进度 ${taskProgress(task)}%`}><span style={{ width: `${taskProgress(task)}%` }} /></div>
+
+      {editing && task.status !== 'done' && (
+        <div className="mt-3 grid grid-cols-[1fr_72px] gap-2">
+          <input className="field py-2 text-sm" value={task.name} disabled={locked} onChange={(event) => updateTask(task.id, { name: event.target.value })} aria-label="编辑任务名称" />
+          <input className="field py-2 text-sm" type="number" min={1} max={12} value={task.estimatePomodoros} disabled={locked} onChange={(event) => updateTask(task.id, { estimatePomodoros: Number(event.target.value) })} aria-label="编辑预计番茄数" />
+        </div>
+      )}
+
+      <div className="task-actions">
+        {task.status !== 'done' && <button onClick={() => selectTask(task.id)} disabled={locked || selected} aria-label="设为当前任务">设为当前</button>}
+        {task.status !== 'done' && <button onClick={() => setEditing((value) => !value)} disabled={locked} aria-label="编辑任务"><Pencil size={15} /></button>}
+        {task.status !== 'done' && <button onClick={() => reorderTask(task.id, -1)} disabled={index === 0 || locked} aria-label="上移任务"><ChevronUp size={15} /></button>}
+        {task.status !== 'done' && <button onClick={() => reorderTask(task.id, 1)} disabled={index === total - 1 || locked} aria-label="下移任务"><ChevronDown size={15} /></button>}
+        {task.status !== 'done' && <button onClick={() => markTaskDone(task.id)} disabled={locked} aria-label="标记完成"><CheckCircle2 size={15} /></button>}
+        <button onClick={confirmDelete} disabled={locked} aria-label="删除任务"><Trash2 size={15} /></button>
+      </div>
+    </article>
+  );
+}
+
+function TaskSection({ title, tasks, currentTaskId, locked }: { title: string; tasks: TodayTask[]; currentTaskId: string | null; locked: boolean }) {
+  if (!tasks.length) return null;
+  return (
+    <div className="task-section">
+      <h3>{title}</h3>
+      <div className="space-y-2">
+        {tasks.map((task, index) => (
+          <TaskItem key={task.id} task={task} index={index} total={tasks.length} selected={task.id === currentTaskId} locked={locked} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function TaskList() {
+  const rawTasks = usePomodoroStore((state) => state.tasks);
+  const records = usePomodoroStore((state) => state.records);
+  const tasks = useMemo(() => [...rawTasks].sort((a, b) => a.priority - b.priority), [rawTasks]);
+  const currentTaskId = usePomodoroStore((state) => state.currentTaskId);
+  const timer = usePomodoroStore((state) => state.timer);
+  const addTask = usePomodoroStore((state) => state.addTask);
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<TaskCategory>('coding');
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+  const [estimate, setEstimate] = useState(2);
+  const isLocked = timer.status === 'running' && timer.mode === 'focus';
+  const activeTask = tasks.filter((task) => task.status !== 'done' && task.id === currentTaskId);
+  const todoTasks = tasks.filter((task) => task.status !== 'done' && task.id !== currentTaskId);
+  const doneTasks = tasks.filter((task) => task.status === 'done');
+  const todayRecords = records.filter((record) => new Date(record.endedAt).toDateString() === new Date().toDateString());
+  const effectiveTodayRecords = todayRecords.filter(isEffectivePomodoro);
+
+  const submit = () => {
+    addTask({ name, category, difficulty, estimatePomodoros: estimate });
+    setName('');
+  };
+
+  return (
+    <section className="panel task-list-panel" aria-labelledby="task-list-title">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div id="task-list-title" className="panel-title"><Flag size={18} />当前任务列表</div>
+          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">{doneTasks.length}/{tasks.length} 已完成 · 今日历史 {effectiveTodayRecords.length} 轮。</p>
+        </div>
+      </div>
+
+      <div className="quick-add mt-4">
+        <div className="flex gap-2">
+          <input
+            className="field min-w-0"
+            value={name}
+            maxLength={42}
+            placeholder="添加任务，例如：整理演示脚本"
+            onChange={(event) => setName(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && submit()}
+          />
+          <button className="icon-button" onClick={submit} disabled={!name.trim()} aria-label="添加今日任务"><Plus size={18} /></button>
+        </div>
+        <details className="mt-2">
+          <summary>设置类型、难度和预计番茄</summary>
+          <div className="mt-2 grid grid-cols-[1fr_1fr_92px] gap-2">
+            <select className="field" value={category} onChange={(event) => setCategory(event.target.value as TaskCategory)} aria-label="任务类型">
+              {categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+            </select>
+            <select className="field" value={difficulty} onChange={(event) => setDifficulty(event.target.value as Difficulty)} aria-label="任务难度">
+              {difficulties.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+            </select>
+            <input className="field" type="number" min={1} max={12} value={estimate} onChange={(event) => setEstimate(Number(event.target.value))} aria-label="预计番茄数" />
+          </div>
+        </details>
+      </div>
+
+      <div className="mt-4 space-y-4">
+        {!tasks.length && <div className="empty-state py-6">{todayRecords.length ? '当前任务列表为空；今日历史专注记录已保留在复盘区。添加任务后才能开始新一轮专注。' : '添加第一个今日任务后，才能开始专注。'}</div>}
+        <TaskSection title="正在进行" tasks={activeTask} currentTaskId={currentTaskId} locked={isLocked} />
+        <TaskSection title="待开始" tasks={todoTasks} currentTaskId={currentTaskId} locked={isLocked} />
+        <TaskSection title="已完成" tasks={doneTasks} currentTaskId={currentTaskId} locked={isLocked} />
+      </div>
+    </section>
+  );
+}
