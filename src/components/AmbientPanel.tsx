@@ -38,7 +38,7 @@ export function AmbientPanel() {
   };
 
   return (
-    <section className="panel ambience-panel" aria-labelledby="ambient-panel-title">
+    <section className="panel ambient-panel" aria-labelledby="ambient-panel-title">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div id="ambient-panel-title" className="panel-title"><Headphones size={18} />沉浸氛围</div>
@@ -50,9 +50,9 @@ export function AmbientPanel() {
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        <div className="ambience-summary"><span>风景</span><strong>{visualLabel}</strong></div>
-        <div className="ambience-summary"><span>声音</span><strong>{settings.whiteNoiseEnabled && activeAudio !== 'none' ? audioLabel : '静音'}</strong></div>
-        <label className={`ambience-summary ${(!settings.whiteNoiseEnabled || activeAudio === 'none') ? 'opacity-55' : ''}`}>
+        <div className="ambient-summary"><span>风景</span><strong>{visualLabel}</strong></div>
+        <div className="ambient-summary"><span>声音</span><strong>{settings.whiteNoiseEnabled && activeAudio !== 'none' ? audioLabel : '静音'}</strong></div>
+        <label className={`ambient-summary ${(!settings.whiteNoiseEnabled || activeAudio === 'none') ? 'opacity-55' : ''}`}>
           <span>音量</span>
           <input
             type="range"
@@ -140,5 +140,6 @@ export function AmbientPanel() {
     </section>
   );
 }
+
 
 

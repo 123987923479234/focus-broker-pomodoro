@@ -13,7 +13,7 @@ export function FocusCycleProgress() {
 
   return (
     <div className="cycle-progress" aria-label="番茄循环进度">
-      <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">
+      <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-300">
         <span>循环进度</span>
         <span>{timer.mode === 'longBreak' ? '长休息' : `第 ${currentRound || 1}/${rounds} 轮`}</span>
       </div>
@@ -36,3 +36,4 @@ export function FocusCycleProgress() {
     </div>
   );
 }
+

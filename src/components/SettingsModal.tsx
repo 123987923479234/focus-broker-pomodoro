@@ -62,7 +62,7 @@ export function SettingsModal() {
       </div>
 
       <div className="space-y-3">
-        <h3 className="text-sm font-black text-slate-800 dark:text-white">拦截白名单</h3>
+        <h3 className="text-sm font-semibold text-slate-800 dark:text-white">拦截白名单</h3>
         <div className="flex gap-2">
           <input className="field" value={site} placeholder="github.com" onChange={(event) => setSite(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && add()} />
           <button className="icon-button" onClick={add} aria-label="添加"><Plus size={18} /></button>
@@ -79,3 +79,4 @@ export function SettingsModal() {
     </div>
   );
 }
+

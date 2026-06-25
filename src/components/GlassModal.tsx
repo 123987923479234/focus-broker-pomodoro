@@ -24,7 +24,7 @@ export function GlassModal({ title, children, onClose, wide = false }: GlassModa
         onDragEnd={(_, info) => {
           if (info.offset.y > 120) onClose();
         }}
-        className={`max-h-[88vh] w-full overflow-hidden rounded-2xl border border-white/30 bg-glass-day shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-glass-night ${wide ? 'max-w-5xl' : 'max-w-xl'}`}
+        className={`modal max-h-[88vh] w-full overflow-hidden rounded-2xl border border-white/30 bg-glass-day shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-glass-night ${wide ? 'max-w-5xl' : 'max-w-xl'}`}
         initial={{ y: 56, scale: 0.98, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: 44, scale: 0.98, opacity: 0 }}
@@ -41,3 +41,4 @@ export function GlassModal({ title, children, onClose, wide = false }: GlassModa
     </motion.div>
   );
 }
+

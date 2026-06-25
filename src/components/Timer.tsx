@@ -76,7 +76,7 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
         />
         <ProgressRing progress={progress} color={color} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${isSprint ? 'bg-red-500/12 text-red-600 dark:text-red-300' : 'bg-white/70 text-slate-600 shadow-sm dark:bg-white/10 dark:text-slate-300'}`}>{isSprint ? '冲刺' : phaseLabel(timer.mode)}</span>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isSprint ? 'bg-red-500/12 text-red-600 dark:text-red-300' : 'bg-white/70 text-slate-600 shadow-sm dark:bg-white/10 dark:text-slate-300'}`}>{isSprint ? '冲刺' : phaseLabel(timer.mode)}</span>
           <motion.div
             className={`mt-4 font-display font-black tabular-nums leading-none ${isSprint ? 'text-5xl text-red-500 sm:text-6xl' : 'text-5xl text-slate-950 dark:text-white sm:text-6xl'}`}
             animate={{ scale: isSprint ? [1, 1.05, 1] : 1 }}
@@ -84,7 +84,7 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
           >
             {formatTimer(remainingMs, timer.status === 'running')}
           </motion.div>
-          <p className="mt-3 max-w-64 truncate text-sm font-black text-slate-600 dark:text-slate-200">{isBreak ? '恢复一下，下一轮会更稳。' : activeTaskName || '请先选择或创建一个任务'}</p>
+          <p className="mt-3 max-w-64 truncate text-sm font-semibold text-slate-600 dark:text-slate-200">{isBreak ? '恢复一下，下一轮会更稳。' : activeTaskName || '请先选择或创建一个任务'}</p>
           {!isBreak && taskProgressText && <p className="mt-1 text-xs font-bold text-blue-700 dark:text-blue-200">当前任务进度：{taskProgressText}</p>}
         </div>
       </div>
@@ -143,6 +143,7 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
     </section>
   );
 }
+
 
 
 
