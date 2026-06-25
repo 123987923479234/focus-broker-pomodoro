@@ -34,7 +34,7 @@ export function ProgressRing({ progress, color, size = 360, stroke = 18 }: Progr
         strokeDasharray={circumference}
         animate={{ strokeDashoffset: dashOffset }}
         transition={{ duration: 0.28, ease: 'easeOut' }}
-        style={{ filter: `drop-shadow(0 0 18px ${color}66)` }}
+        style={{ filter: `drop-shadow(0 0 10px ${color}38)` }}
       />
     </svg>
   );

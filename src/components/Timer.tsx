@@ -72,7 +72,7 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
       <div className="relative mx-auto mt-3 aspect-square w-full max-w-[300px] sm:max-w-[350px] xl:max-w-[380px]">
         <motion.div
           className="absolute inset-0 rounded-full"
-          animate={{ boxShadow: isSprint ? '0 0 70px rgba(239,68,68,0.34)' : isBreak ? '0 0 56px rgba(22,163,74,0.24)' : '0 0 58px rgba(37,99,235,0.26)' }}
+          animate={{ boxShadow: isSprint ? '0 0 42px rgba(239,68,68,0.18)' : isBreak ? '0 0 34px rgba(22,163,74,0.14)' : '0 0 38px rgba(37,99,235,0.16)' }}
         />
         <ProgressRing progress={progress} color={color} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
@@ -133,7 +133,7 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
         <button className="icon-button" onClick={resetTimer} aria-label="重置计时器">
           <RotateCcw size={18} />
         </button>
-        <button className="icon-button" onClick={enterImmersive} aria-label="进入沉浸模式">
+        <button className="icon-button" onClick={enterImmersive} aria-label="进入极简模式">
           <Maximize2 size={18} />
         </button>
       </div>
@@ -143,7 +143,3 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
     </section>
   );
 }
-
-
-
-

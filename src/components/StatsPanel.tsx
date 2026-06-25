@@ -124,7 +124,7 @@ export function StatsPanel() {
                 <span>连续专注：{streak} 天</span>
                 <span>距目标：{weeklyGap} 分钟</span>
               </div>
-              <ResponsiveContainer width="100%" height={118}>
+              <ResponsiveContainer width="100%" height={96}>
                 <BarChart data={weekly} margin={{ left: -20, right: 8, top: 8, bottom: 0 }}>
                   <XAxis dataKey="day" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
