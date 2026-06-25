@@ -42,11 +42,11 @@
     min-width: 320px;
     min-height: 100vh;
     background:
-      radial-gradient(circle at 16% 8%, rgba(47, 107, 255, 0.13), transparent 28rem),
-      radial-gradient(circle at 84% 4%, rgba(14, 165, 233, 0.10), transparent 26rem),
-      linear-gradient(180deg, #eef5f8 0%, #e8f1f6 100%);
+      radial-gradient(circle at 18% 8%, rgba(37, 99, 235, 0.10), transparent 30rem),
+      radial-gradient(circle at 82% 2%, rgba(14, 165, 233, 0.07), transparent 28rem),
+      linear-gradient(180deg, #eef5f8 0%, #e9f1f5 100%);
     color: var(--fb-ink);
-    font-weight: 500;
+    font-weight: 450;
     text-rendering: optimizeLegibility;
   }
 
@@ -94,8 +94,8 @@
     padding: 10px 12px 10px 16px;
     border: 1px solid var(--fb-border);
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.055);
   }
 
   .dark .compact-header {
@@ -187,8 +187,8 @@
   .timer-shell,
   .modal {
     border: 1px solid var(--fb-border);
-    background: var(--fb-card);
-    box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.055);
   }
 
   .panel,
@@ -203,6 +203,7 @@
   .dark .panel,
   .dark .timer-shell,
   .dark .modal {
+    background: rgba(8, 17, 31, 0.84);
     box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
   }
 
@@ -363,7 +364,7 @@
   }
 
   .timer-shell .relative.mx-auto.mt-3 {
-    max-width: 316px !important;
+    max-width: 278px !important;
     margin-top: 10px !important;
   }
 
@@ -372,7 +373,7 @@
   }
 
   .timer-shell .font-display {
-    font-size: clamp(3rem, 6vw, 4.25rem) !important;
+    font-size: clamp(2.75rem, 5.2vw, 3.8rem) !important;
     font-weight: 900 !important;
     letter-spacing: 0 !important;
   }
@@ -605,12 +606,41 @@
     padding: 16px;
   }
 
+  .review-report-head {
+    display: grid;
+    gap: 8px;
+    border-bottom: 1px solid rgba(120, 140, 160, 0.14);
+    padding-bottom: 12px;
+  }
+
+  .review-conclusion {
+    margin: 0;
+    max-width: 860px;
+    color: var(--fb-ink);
+    font-size: clamp(1rem, 1.5vw, 1.18rem);
+    font-weight: 700;
+    line-height: 1.55;
+  }
+
+  .review-note,
+  .experimental-note {
+    margin: 0;
+    border: 1px solid rgba(120, 140, 160, 0.14);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.48);
+    padding: 8px 10px;
+    color: var(--fb-muted);
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.55;
+  }
+
   .stat-card {
-    min-height: 68px;
+    min-height: 58px;
     border: 1px solid rgba(120, 140, 160, 0.14);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.56);
-    padding: 11px 12px;
+    padding: 9px 11px;
     box-shadow: none;
   }
 
@@ -632,7 +662,7 @@
     display: block;
     margin-top: 2px;
     color: var(--fb-ink);
-    font-size: 24px;
+    font-size: 21px;
     font-weight: 900;
   }
 
@@ -1000,7 +1030,7 @@
   }
 
   .timer-shell .relative.mx-auto.mt-3 {
-    max-width: min(74vw, 280px) !important;
+    max-width: min(68vw, 246px) !important;
   }
 
   .timer-shell .font-display {
@@ -1012,7 +1042,7 @@
   }
 
   .stat-card {
-    min-height: 64px;
+    min-height: 56px;
   }
 
   .ambient-panel > .mt-4.grid {
@@ -1023,32 +1053,6 @@
     flex-direction: column;
   }
 }
-
-@layer components {
-  .ambient-panel > .mt-4.space-y-4.border-t {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(180px, 0.75fr);
-    gap: 12px;
-    align-items: start;
-    padding-top: 12px;
-  }
-
-  .ambient-panel .scene-choice,
-  .ambient-panel .sound-choice {
-    min-height: 58px;
-  }
-
-  .ambient-panel .segmented {
-    align-self: end;
-  }
-}
-
-@media (max-width: 900px) {
-  .ambient-panel > .mt-4.space-y-4.border-t {
-    display: block;
-  }
-}
-
 
 /* Dynamic scene classes are generated as scene-${visualScene}; keep them outside Tailwind layers so they are never purged. */
 .scenic-bg {
@@ -1069,9 +1073,9 @@
 
 .scene-blueLakeTulips {
   background:
-    radial-gradient(circle at 40% 18%, rgba(123, 181, 255, 0.34), transparent 26rem),
-    radial-gradient(circle at 18% 78%, rgba(236, 128, 170, 0.16), transparent 22rem),
-    linear-gradient(180deg, #eaf4ff 0%, #e7f1f7 54%, #dcebf2 100%);
+    radial-gradient(circle at 22% 12%, rgba(37, 99, 235, 0.12), transparent 28rem),
+    radial-gradient(circle at 78% 4%, rgba(14, 165, 233, 0.08), transparent 26rem),
+    linear-gradient(180deg, #eef5f8 0%, #e8f1f5 56%, #dde9f0 100%);
 }
 
 .scene-mistForest {
@@ -1107,7 +1111,7 @@
   height: 38%;
   border-radius: 999px;
   filter: blur(38px);
-  opacity: 0.55;
+  opacity: 0.32;
 }
 
 .scenic-scene::after {
@@ -1116,11 +1120,11 @@
   bottom: -10%;
   height: 34%;
   filter: blur(18px);
-  opacity: 0.40;
+  opacity: 0.24;
 }
 
-.scene-blueLakeTulips::before { background: linear-gradient(90deg, rgba(37, 99, 235, 0.20), rgba(236, 128, 170, 0.12)); }
-.scene-blueLakeTulips::after { background: linear-gradient(180deg, rgba(56, 189, 248, 0.18), rgba(59, 130, 246, 0.08)); }
+.scene-blueLakeTulips::before { background: linear-gradient(90deg, rgba(37, 99, 235, 0.20), rgba(14, 165, 233, 0.06)); }
+.scene-blueLakeTulips::after { background: linear-gradient(180deg, rgba(37, 99, 235, 0.08), rgba(14, 165, 233, 0.06)); }
 .scene-mistForest::before { background: linear-gradient(90deg, rgba(22, 163, 74, 0.18), rgba(20, 184, 166, 0.12)); }
 .scene-mistForest::after { background: linear-gradient(180deg, rgba(74, 222, 128, 0.16), rgba(15, 118, 110, 0.09)); }
 .scene-rainWindow::before { background: linear-gradient(90deg, rgba(59, 130, 246, 0.18), rgba(245, 158, 11, 0.12)); }
@@ -1176,4 +1180,3 @@
   inset: 0;
   background: radial-gradient(circle at 50% 34%, transparent 0 48%, rgba(11, 18, 32, 0.05) 88%);
 }
-

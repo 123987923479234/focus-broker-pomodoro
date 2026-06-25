@@ -14,7 +14,7 @@ function createMainWindow() {
     height: 820,
     minWidth: 375,
     minHeight: 680,
-    title: '超豪华版番茄钟',
+    title: 'Focus Broker',
     backgroundColor: '#07111f',
     autoHideMenuBar: true,
     show: false,
@@ -55,4 +55,3 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
-

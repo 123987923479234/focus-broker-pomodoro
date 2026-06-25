@@ -1,5 +1,5 @@
-appId: com.codex.luxury-pomodoro-agent
-productName: 超豪华版番茄钟
+appId: com.focusbroker.app
+productName: Focus Broker
 directories:
   output: release
 files:
@@ -25,6 +25,6 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: 超豪华版番茄钟
+  shortcutName: Focus Broker
 portable:
   artifactName: ${productName}-便携版-${version}-${arch}.${ext}

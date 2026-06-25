@@ -4,7 +4,7 @@ import { categoryLabel, humanMinutes } from '../lib/format';
 import { effectiveRuleText, isEffectivePomodoro } from '../lib/pomodoroRules';
 import { usePomodoroStore } from '../store/usePomodoroStore';
 
-const palette = ['#2563EB', '#0F766E', '#9333EA', '#EA580C', '#16A34A', '#DC2626'];
+const palette = ['#2563EB', '#0F766E', '#7C3AED', '#0EA5E9', '#16A34A'];
 const weeklyMinuteGoal = 150;
 
 function isToday(timestamp: number) {
@@ -30,6 +30,17 @@ function consecutiveDays(weekly: Array<{ minutes: number }>) {
     streak += 1;
   }
   return streak;
+}
+
+function reviewConclusion(params: { totalRecords: number; effectiveCount: number; ineffectiveCount: number; minutes: number; completedTasks: number; topCategory?: string }) {
+  const { totalRecords, effectiveCount, ineffectiveCount, minutes, completedTasks, topCategory } = params;
+  if (effectiveCount > 0) {
+    return `今天已形成 ${effectiveCount} 个有效番茄，累计推进 ${minutes} 分钟。${topCategory ? `主要投入在 ${topCategory} 类任务。` : ''}${completedTasks > 0 ? `已归档 ${completedTasks} 项任务。` : '建议把已完成成果及时归档。'}`;
+  }
+  if (totalRecords > 0 && ineffectiveCount > 0) {
+    return `你有 ${minutes} 分钟启动记录，但还没有达到有效番茄标准。建议先完成 1 个完整专注轮次。`;
+  }
+  return '今天还没有形成有效番茄。建议先选择一个明确任务，并完成 1 个完整专注轮次。';
 }
 
 export function StatsPanel() {
@@ -69,50 +80,51 @@ export function StatsPanel() {
   const categoryData = Object.entries(categoryMap).map(([category, value]) => ({ category: categoryLabel(category), value }));
   const topCategory = categoryData[0]?.category;
   const hasCurrentTasks = tasks.length > 0;
-  const insight = todayRecords.length
-    ? `今天有效完成 ${effectiveTodayRecords.length} 轮，累计专注 ${todayMinutes} 分钟。${topCategory ? `主要投入在：${topCategory}类任务。` : ''}${completedTasks === 0 ? '当前还没有完成任务，说明今天有启动行为但结果产出尚未归档。' : `已归档 ${completedTasks} 项任务。`}`
-    : '完成第一轮后，这里会生成今日结论，而不是只给你一张空图。';
+  const conclusion = reviewConclusion({
+    totalRecords: todayRecords.length,
+    effectiveCount: effectiveTodayRecords.length,
+    ineffectiveCount: ineffectiveTodayRecords.length,
+    minutes: todayMinutes,
+    completedTasks,
+    topCategory,
+  });
 
   return (
     <section className="panel stats-panel" aria-labelledby="stats-panel-title">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div id="stats-panel-title" className="panel-title"><BarChart3 size={18} />今日复盘</div>
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">{insight}</p>
-          {!hasCurrentTasks && todayRecords.length > 0 && (
-            <p className="mt-2 rounded-xl border border-blue-200/70 bg-blue-50/70 px-3 py-2 text-xs font-semibold text-blue-800 dark:border-blue-300/20 dark:bg-blue-400/10 dark:text-blue-100">
-              当前任务列表为空；下方统计来自今日历史记录。删除任务不会删除历史记录，任务类型仍会保留用于复盘。
-            </p>
-          )}
-        </div>
+      <div className="review-report-head">
+        <div id="stats-panel-title" className="panel-title"><BarChart3 size={18} />今日复盘</div>
+        <p className="review-conclusion">{conclusion}</p>
+        {!hasCurrentTasks && todayRecords.length > 0 && (
+          <p className="review-note">当前任务列表为空；统计来自今日历史记录。删除任务不会删除历史记录。</p>
+        )}
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-4">
-        <div className="stat-card"><TimerReset size={17} /><span>有效番茄</span><strong>{effectiveTodayRecords.length}</strong></div>
-        <div className="stat-card"><Flame size={17} /><span>专注分钟</span><strong>{todayMinutes}</strong></div>
-        <div className="stat-card"><PieChart size={17} /><span>完成任务</span><strong>{completedTasks}</strong></div>
-        <div className="stat-card"><LineChart size={17} /><span>复盘精力</span><strong>{avgEnergy}</strong></div>
+      <div className="mt-4 grid gap-2 sm:grid-cols-4">
+        <div className="stat-card"><TimerReset size={16} /><span>有效番茄</span><strong>{effectiveTodayRecords.length}</strong></div>
+        <div className="stat-card"><Flame size={16} /><span>专注分钟</span><strong>{todayMinutes}</strong></div>
+        <div className="stat-card"><PieChart size={16} /><span>完成任务</span><strong>{completedTasks}</strong></div>
+        <div className="stat-card"><LineChart size={16} /><span>复盘精力</span><strong>{avgEnergy}</strong></div>
       </div>
 
       <div className="mt-3 space-y-1 text-xs font-medium text-slate-500 dark:text-slate-300">
         <p>{effectiveRuleText()}</p>
         {todayRecords.length > 0 && ineffectiveTodayRecords.length > 0 && (
-          <p>今日有 {ineffectiveTodayRecords.length} 条未计入有效番茄的专注记录；专注分钟和复盘精力仍会保留，方便回看中断原因。</p>
+          <p>今日有 {ineffectiveTodayRecords.length} 条未计入有效番茄的启动记录；专注分钟和复盘精力会保留，方便回看中断原因。</p>
         )}
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <div className="stats-chart compact">
-          <h3>近 7 天趋势</h3>
+          <h3>近 7 天节奏</h3>
           {hasWeeklyData ? (
             <>
-              <div className="mb-3 grid grid-cols-2 gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 sm:grid-cols-4">
+              <div className="mb-3 grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 sm:grid-cols-4">
                 <span>本周累计：{weeklyMinutes} 分钟</span>
                 <span>最高：{bestDay.day} {bestDay.minutes} 分钟</span>
                 <span>连续专注：{streak} 天</span>
                 <span>距目标：{weeklyGap} 分钟</span>
               </div>
-              <ResponsiveContainer width="100%" height={130}>
+              <ResponsiveContainer width="100%" height={118}>
                 <BarChart data={weekly} margin={{ left: -20, right: 8, top: 8, bottom: 0 }}>
                   <XAxis dataKey="day" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
@@ -122,7 +134,7 @@ export function StatsPanel() {
               </ResponsiveContainer>
             </>
           ) : (
-            <div className="empty-state h-32">连续使用 3 天后，这里会显示你的专注习惯。</div>
+            <div className="empty-state h-28">连续使用后，这里会显示你的任务推进节奏。</div>
           )}
         </div>
         <div className="stats-chart compact">
@@ -130,14 +142,14 @@ export function StatsPanel() {
           {categoryData.length ? (
             <div className="space-y-2 pt-1">
               {categoryData.map((item, index) => (
-                <div key={item.category} className="flex items-center justify-between gap-3 text-sm font-bold text-slate-700 dark:text-slate-200">
+                <div key={item.category} className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
                   <span className="inline-flex items-center gap-2"><i className="h-2.5 w-2.5 rounded-full" style={{ background: palette[index % palette.length] }} />{item.category}</span>
                   <span>{item.value} 轮</span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="empty-state h-32">完成第一轮有效番茄后，显示任务类型占比。</div>
+            <div className="empty-state h-28">完成第一轮有效番茄后，显示任务类型占比。</div>
           )}
         </div>
       </div>

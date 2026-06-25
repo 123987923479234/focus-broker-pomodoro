@@ -1,9 +1,9 @@
 {
-  "name": "luxury-pomodoro-agent",
+  "name": "focus-broker",
   "private": true,
   "version": "0.1.0",
-  "description": "超豪华版番茄钟桌面应用",
-  "author": "Codex",
+  "description": "Task-driven Pomodoro workspace for deep focus and daily review",
+  "author": "Focus Broker Team",
   "main": "electron/main.cjs",
   "type": "module",
   "scripts": {

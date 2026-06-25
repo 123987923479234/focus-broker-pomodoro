@@ -31,7 +31,7 @@ export function useTimerEffects(remainingMs: number) {
   const lastReviewRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const originalTitle = '超豪华版番茄钟';
+    const originalTitle = 'Focus Broker';
     if (timer.status === 'running' || timer.status === 'paused') {
       const phase = timer.mode === 'focus' ? '专注' : timer.mode === 'longBreak' ? '长休息' : '短休息';
       document.title = `${formatTimer(remainingMs)} · ${phase}${currentTask.name ? ` · ${currentTask.name}` : ''}`;

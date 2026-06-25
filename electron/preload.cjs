@@ -1,6 +1,6 @@
 const { contextBridge } = require('electron');
 
 contextBridge.exposeInMainWorld('desktopApp', {
-  name: '超豪华版番茄钟',
+  name: 'Focus Broker',
   platform: process.platform,
 });

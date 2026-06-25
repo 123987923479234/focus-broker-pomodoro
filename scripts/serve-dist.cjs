@@ -52,5 +52,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`超豪华版番茄钟网页版已启动：http://${host}:${port}/`);
+  console.log(`Focus Broker 网页版已启动：http://${host}:${port}/`);
 });

@@ -87,7 +87,8 @@ export default function App() {
   useEnergySampling();
   useBroadcastSync();
   useTimerEffects(clock.remainingMs);
-  useWhiteNoise({ enabled: settings.whiteNoiseEnabled && timer.status === 'running', volume: settings.baseVolume, decay: clock.isFinalFive, scene: settings.audioScene ?? 'rainKeyboard' });
+  const whiteNoiseScene = settings.audioScene === 'none' ? 'none' : 'rainKeyboard';
+  useWhiteNoise({ enabled: settings.whiteNoiseEnabled && timer.status === 'running', volume: settings.baseVolume, decay: clock.isFinalFive, scene: whiteNoiseScene });
 
   useEffect(() => {
     listPomodoroRecords().then(setRecords).catch(() => setRecords([]));
@@ -119,7 +120,7 @@ export default function App() {
         <header className="compact-header">
           <div className="brand-line">
             <strong>Focus Broker</strong>
-            <span>沉浸式专注工作台</span>
+            <span>用任务驱动番茄钟，让每一轮专注都有记录和复盘。</span>
           </div>
           <div className="top-stats" aria-label="今日概览">
             <span><b>{todayStats.pomodoros}</b> 轮</span>
@@ -160,9 +161,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
-
-
-

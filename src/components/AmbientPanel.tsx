@@ -1,7 +1,7 @@
-import { CloudRain, Headphones, Moon, Music2, Settings2, Sparkles, Sun, Trees, Waves } from 'lucide-react';
+import { CloudRain, Headphones, Moon, Settings2, Sparkles, Sun } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { usePomodoroStore } from '../store/usePomodoroStore';
-import type { AudioScene, ThemeMode, VisualScene } from '../types/pomodoro';
+import type { AudioScene, ThemeMode } from '../types/pomodoro';
 
 const themeOptions: Array<{ value: ThemeMode; label: string }> = [
   { value: 'system', label: '系统' },
@@ -9,29 +9,19 @@ const themeOptions: Array<{ value: ThemeMode; label: string }> = [
   { value: 'night', label: '深夜' },
 ];
 
-const visualScenes: Array<{ value: VisualScene; label: string; hint: string }> = [
-  { value: 'blueLakeTulips', label: '蓝湖郁金香', hint: '花丛、水面、微光漂浮' },
-  { value: 'mistForest', label: '薄雾森林', hint: '远山、林影、慢雾' },
-  { value: 'rainWindow', label: '雨夜窗边', hint: '雨痕、玻璃、暖光' },
-  { value: 'starLake', label: '星河湖面', hint: '月光、群星、倒影' },
-];
-
 const audioScenes: Array<{ value: AudioScene; label: string; hint: string; icon: LucideIcon }> = [
-  { value: 'rainKeyboard', label: '雨声 + 键盘', hint: '轻雨和低频敲击', icon: CloudRain },
-  { value: 'softRain', label: '轻雨', hint: '更柔和的雨幕', icon: CloudRain },
-  { value: 'forestStream', label: '林间溪流', hint: '水流和远处鸟鸣', icon: Trees },
-  { value: 'lofiPiano', label: '极简钢琴', hint: '稀疏、安静、无鼓点', icon: Music2 },
-  { value: 'warmPads', label: '暖色铺底', hint: '缓慢和弦氛围', icon: Waves },
-  { value: 'none', label: '关闭声音', hint: '只保留视觉沉浸', icon: Sparkles },
+  { value: 'rainKeyboard', label: '雨声 + 键盘', hint: '合成白噪音，开始专注后播放', icon: CloudRain },
+  { value: 'none', label: '静音', hint: '只保留计时和复盘流程', icon: Sparkles },
 ];
 
 export function AmbientPanel() {
   const settings = usePomodoroStore((state) => state.settings);
   const setSettings = usePomodoroStore((state) => state.setSettings);
   const activeAudio = settings.audioScene ?? 'rainKeyboard';
-  const activeVisual = settings.visualScene ?? 'blueLakeTulips';
-  const visualLabel = visualScenes.find((scene) => scene.value === activeVisual)?.label ?? '蓝湖郁金香';
-  const audioLabel = audioScenes.find((scene) => scene.value === activeAudio)?.label ?? '雨声 + 键盘';
+  const audioLabel = settings.whiteNoiseEnabled && activeAudio !== 'none'
+    ? audioScenes.find((scene) => scene.value === activeAudio)?.label ?? '雨声 + 键盘'
+    : '静音';
+  const themeLabel = themeOptions.find((option) => option.value === settings.themeMode)?.label ?? '系统';
 
   const chooseAudio = (audioScene: AudioScene) => {
     setSettings({ audioScene, whiteNoiseEnabled: audioScene !== 'none' });
@@ -41,17 +31,16 @@ export function AmbientPanel() {
     <section className="panel ambient-panel" aria-labelledby="ambient-panel-title">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div id="ambient-panel-title" className="panel-title"><Headphones size={18} />沉浸氛围</div>
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">辅助专注，不打断任务流。</p>
+          <div id="ambient-panel-title" className="panel-title"><Headphones size={18} />专注环境</div>
+          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">辅助保持节奏，不抢任务和复盘的主线。</p>
         </div>
         <button className="ghost-button h-9 min-h-9 px-3" onClick={() => setSettings({ ambienceExpanded: !settings.ambienceExpanded })}>
-          <Settings2 size={16} />{settings.ambienceExpanded ? '收起' : '更换氛围'}
+          <Settings2 size={16} />{settings.ambienceExpanded ? '收起' : '环境设置'}
         </button>
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        <div className="ambient-summary"><span>风景</span><strong>{visualLabel}</strong></div>
-        <div className="ambient-summary"><span>声音</span><strong>{settings.whiteNoiseEnabled && activeAudio !== 'none' ? audioLabel : '静音'}</strong></div>
+        <div className="ambient-summary"><span>声音</span><strong>{audioLabel}</strong></div>
         <label className={`ambient-summary ${(!settings.whiteNoiseEnabled || activeAudio === 'none') ? 'opacity-55' : ''}`}>
           <span>音量</span>
           <input
@@ -62,84 +51,60 @@ export function AmbientPanel() {
             value={settings.baseVolume}
             disabled={!settings.whiteNoiseEnabled || activeAudio === 'none'}
             onChange={(event) => setSettings({ baseVolume: Number(event.target.value) })}
-            className="mt-2 w-full accent-cyan-600"
+            className="mt-2 w-full accent-blue-600"
             aria-label="音量"
           />
         </label>
+        <div className="ambient-summary"><span>主题</span><strong>{themeLabel}</strong></div>
       </div>
 
       {settings.ambienceExpanded && (
-        <div className="mt-4 space-y-4 border-t border-white/[0.35] pt-4 dark:border-white/10">
+        <div className="mt-4 grid gap-4 border-t border-white/[0.35] pt-4 dark:border-white/10 lg:grid-cols-[1fr_0.8fr]">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
-              <span>动态风景</span>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-300">默认低干扰</span>
+              <span>合成声音</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-300">开始专注后播放</span>
             </div>
-            <div className="grid grid-cols-2 gap-2" role="group" aria-label="动态风景选择">
-              {visualScenes.map((scene) => (
-                <button
-                  key={scene.value}
-                  type="button"
-                  aria-pressed={activeVisual === scene.value}
-                  className={`scene-choice ${activeVisual === scene.value ? 'active' : ''}`}
-                  onClick={() => setSettings({ visualScene: scene.value })}
-                >
-                  <span>{scene.label}</span>
-                  <small>{scene.hint}</small>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
-              <span>音景 / 纯音乐</span>
-              <input
-                type="checkbox"
-                checked={settings.whiteNoiseEnabled && activeAudio !== 'none'}
-                onChange={(event) => setSettings({ whiteNoiseEnabled: event.target.checked, audioScene: event.target.checked && activeAudio === 'none' ? 'rainKeyboard' : activeAudio })}
-                className="h-5 w-5 accent-blue-500"
-                aria-label="开启或关闭音景"
-              />
-            </label>
-            <div className="grid grid-cols-2 gap-2" role="group" aria-label="音景选择">
+            <div className="grid gap-2 sm:grid-cols-2" role="group" aria-label="声音选择">
               {audioScenes.map((scene) => {
                 const Icon = scene.icon;
+                const active = activeAudio === scene.value && (scene.value === 'none' || settings.whiteNoiseEnabled);
                 return (
                   <button
                     key={scene.value}
                     type="button"
-                    aria-pressed={activeAudio === scene.value}
-                    className={`sound-choice ${activeAudio === scene.value ? 'active' : ''}`}
+                    aria-pressed={active}
+                    className={`sound-choice ${active ? 'active' : ''}`}
                     onClick={() => chooseAudio(scene.value)}
                   >
                     <Icon size={16} />
                     <span>{scene.label}</span>
-                    <small>{activeAudio === scene.value && settings.whiteNoiseEnabled ? '正在使用' : scene.hint}</small>
+                    <small>{active ? '已选择' : scene.hint}</small>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <div className="segmented" role="group" aria-label="主题模式">
-            {themeOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                aria-pressed={settings.themeMode === option.value}
-                className={settings.themeMode === option.value ? 'active' : ''}
-                onClick={() => setSettings({ themeMode: option.value })}
-              >
-                {option.value === 'night' ? <Moon size={15} /> : <Sun size={15} />}{option.label}
-              </button>
-            ))}
+          <div className="space-y-2">
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">主题模式</div>
+            <div className="segmented" role="group" aria-label="主题模式">
+              {themeOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={settings.themeMode === option.value}
+                  className={settings.themeMode === option.value ? 'active' : ''}
+                  onClick={() => setSettings({ themeMode: option.value })}
+                >
+                  {option.value === 'night' ? <Moon size={15} /> : <Sun size={15} />}{option.label}
+                </button>
+              ))}
+            </div>
+            <p className="experimental-note">背景实验项已暂时收起。当前版本固定使用低干扰冷灰蓝背景，保证任务和复盘优先。</p>
           </div>
         </div>
       )}
     </section>
   );
 }
-
-
-
