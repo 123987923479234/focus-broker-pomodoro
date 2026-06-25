@@ -11,13 +11,19 @@ const cycle = [
 export function BreathGuide() {
   const timer = usePomodoroStore((state) => state.timer);
   const [elapsed, setElapsed] = useState(0);
+  const [expanded, setExpanded] = useState(false);
+
+  const isBreak = timer.mode === 'shortBreak' || timer.mode === 'longBreak' || timer.mode === 'break';
 
   useEffect(() => {
-    if (timer.mode !== 'shortBreak' && timer.mode !== 'longBreak' && timer.mode !== 'break') return;
+    if (!isBreak) {
+      setExpanded(false);
+      return;
+    }
     const started = Date.now();
     const id = window.setInterval(() => setElapsed(Math.floor((Date.now() - started) / 1000)), 250);
     return () => window.clearInterval(id);
-  }, [timer.mode, timer.status]);
+  }, [isBreak, timer.status]);
 
   const phase = useMemo(() => {
     const total = cycle.reduce((sum, item) => sum + item.seconds, 0);
@@ -29,20 +35,29 @@ export function BreathGuide() {
     return cycle[0];
   }, [elapsed]);
 
-  if (timer.mode !== 'shortBreak' && timer.mode !== 'longBreak' && timer.mode !== 'break') return null;
+  if (!isBreak) return null;
 
   return (
-    <section className="panel flex min-h-72 flex-col items-center justify-center text-center">
-      <div className="panel-title mb-5"><Wind size={18} />呼吸引导</div>
-      <div className="relative flex h-44 w-44 items-center justify-center">
-        <div className="absolute inset-0 rounded-full bg-emerald-400/20 animate-breathe" />
-        <div className="absolute inset-7 rounded-full border border-emerald-300/50" />
-        <div className="relative text-center">
-          <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-300">{phase.name}</div>
-          <div className="mt-1 text-sm text-slate-500 dark:text-slate-300">4 · 7 · 8</div>
-        </div>
+    <section className="break-guide" aria-label="休息提示">
+      <div className="break-guide-summary">
+        <div className="break-guide-title"><Wind size={17} /><span>休息提示</span></div>
+        <strong>{phase.name} · 4-7-8</strong>
+        <button className="ghost-button" type="button" onClick={() => setExpanded((value) => !value)}>
+          {expanded ? '收起呼吸引导' : '展开呼吸引导'}
+        </button>
       </div>
+
+      {expanded && (
+        <div className="breath-detail">
+          <div className="breath-orb" aria-hidden="true">
+            <div />
+          </div>
+          <div>
+            <div className="breath-phase">{phase.name}</div>
+            <p>按 4 秒吸气、7 秒屏息、8 秒呼气恢复节奏。</p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-

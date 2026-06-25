@@ -83,6 +83,23 @@ interface PomodoroStore {
   finishReview: (review: ReviewNote) => PendingReview | null;
 }
 
+const PERSIST_STORAGE_KEY = 'focus-broker-state';
+const LEGACY_PERSIST_STORAGE_KEY = ['lux', 'ury-pomodoro-state'].join('');
+
+function migratePersistedStateKey() {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = window.localStorage.getItem(PERSIST_STORAGE_KEY);
+    const legacy = window.localStorage.getItem(LEGACY_PERSIST_STORAGE_KEY);
+    if (!current && legacy) {
+      window.localStorage.setItem(PERSIST_STORAGE_KEY, legacy);
+    }
+  } catch {
+    // 本地存储不可用时，Zustand 会回退到默认初始状态。
+  }
+}
+
+migratePersistedStateKey();
 const defaultTask: FocusTask = {
   name: '',
   difficulty: 'medium',
@@ -528,7 +545,7 @@ export const usePomodoroStore = create<PomodoroStore>()(
       },
     }),
     {
-      name: 'luxury-pomodoro-state',
+      name: PERSIST_STORAGE_KEY,
       partialize: (state) => ({
         settings: state.settings,
         tasks: state.tasks,

@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronDown, ChevronUp, Circle, Flag, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, Circle, Flag, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { categoryLabel, difficultyLabel } from '../lib/format';
 import { isEffectivePomodoro } from '../lib/pomodoroRules';
@@ -40,10 +40,10 @@ function TaskItem({ task, index, total, selected, locked }: { task: TodayTask; i
 
   return (
     <article className={`task-card ${selected ? 'active' : ''} ${task.status === 'done' ? 'done' : ''}`}>
-      <div className="flex items-start gap-2">
+      <div className="task-card-head">
         <button className="task-main" onClick={() => !locked && task.status !== 'done' && selectTask(task.id)} disabled={locked || task.status === 'done'}>
           {task.status === 'done' ? <CheckCircle2 size={18} /> : selected ? <CheckCircle2 size={18} /> : <Circle size={18} />}
-          <span className="min-w-0">
+          <span className="task-text">
             <strong>{task.name}</strong>
             <small>{task.completedPomodoros}/{task.estimatePomodoros} 番茄 · {categoryLabel(task.category)} · {difficultyLabel(task.difficulty)}</small>
           </span>
@@ -54,19 +54,24 @@ function TaskItem({ task, index, total, selected, locked }: { task: TodayTask; i
       <div className="task-progress" aria-label={`任务进度 ${taskProgress(task)}%`}><span style={{ width: `${taskProgress(task)}%` }} /></div>
 
       {editing && task.status !== 'done' && (
-        <div className="mt-3 grid grid-cols-[1fr_72px] gap-2">
-          <input className="field py-2 text-sm" value={task.name} disabled={locked} onChange={(event) => updateTask(task.id, { name: event.target.value })} aria-label="编辑任务名称" />
-          <input className="field py-2 text-sm" type="number" min={1} max={12} value={task.estimatePomodoros} disabled={locked} onChange={(event) => updateTask(task.id, { estimatePomodoros: Number(event.target.value) })} aria-label="编辑预计番茄数" />
+        <div className="task-edit-row">
+          <input className="field" value={task.name} disabled={locked} onChange={(event) => updateTask(task.id, { name: event.target.value })} aria-label="编辑任务名称" />
+          <input className="field" type="number" min={1} max={12} value={task.estimatePomodoros} disabled={locked} onChange={(event) => updateTask(task.id, { estimatePomodoros: Number(event.target.value) })} aria-label="编辑预计番茄数" />
         </div>
       )}
 
       <div className="task-actions">
-        {task.status !== 'done' && <button onClick={() => selectTask(task.id)} disabled={locked || selected} aria-label="设为当前任务">设为当前</button>}
-        {task.status !== 'done' && <button onClick={() => setEditing((value) => !value)} disabled={locked} aria-label="编辑任务"><Pencil size={15} /></button>}
-        {task.status !== 'done' && <button onClick={() => reorderTask(task.id, -1)} disabled={index === 0 || locked} aria-label="上移任务"><ChevronUp size={15} /></button>}
-        {task.status !== 'done' && <button onClick={() => reorderTask(task.id, 1)} disabled={index === total - 1 || locked} aria-label="下移任务"><ChevronDown size={15} /></button>}
-        {task.status !== 'done' && <button onClick={() => markTaskDone(task.id)} disabled={locked} aria-label="标记完成"><CheckCircle2 size={15} /></button>}
-        <button onClick={confirmDelete} disabled={locked} aria-label="删除任务"><Trash2 size={15} /></button>
+        {task.status !== 'done' && <button className="task-action-primary" onClick={() => selectTask(task.id)} disabled={locked || selected}>设为当前</button>}
+        {task.status !== 'done' && <button onClick={() => markTaskDone(task.id)} disabled={locked}>完成</button>}
+        <details className="task-more">
+          <summary aria-label="更多任务操作" title="更多任务操作"><MoreHorizontal size={16} /><span>更多</span></summary>
+          <div className="task-more-menu">
+            {task.status !== 'done' && <button onClick={() => setEditing((value) => !value)} disabled={locked}><Pencil size={14} />{editing ? '收起编辑' : '编辑'}</button>}
+            {task.status !== 'done' && <button onClick={() => reorderTask(task.id, -1)} disabled={index === 0 || locked}><ChevronUp size={14} />上移</button>}
+            {task.status !== 'done' && <button onClick={() => reorderTask(task.id, 1)} disabled={index === total - 1 || locked}><ChevronDown size={14} />下移</button>}
+            <button onClick={confirmDelete} disabled={locked}><Trash2 size={14} />删除</button>
+          </div>
+        </details>
       </div>
     </article>
   );
@@ -87,7 +92,7 @@ function TaskSection({ title, tasks, currentTaskId, locked, collapsible = false 
         <h3>{title}<small>{tasks.length}</small></h3>
       )}
       {open && (
-        <div className="space-y-2">
+        <div className="task-section-list">
           {tasks.map((task, index) => (
             <TaskItem key={task.id} task={task} index={index} total={tasks.length} selected={task.id === currentTaskId} locked={locked} />
           ))}
@@ -116,23 +121,24 @@ export function TaskList() {
   const effectiveTodayRecords = todayRecords.filter(isEffectivePomodoro);
 
   const submit = () => {
+    if (!name.trim()) return;
     addTask({ name, category, difficulty, estimatePomodoros: estimate });
     setName('');
   };
 
   return (
     <section className="panel task-list-panel" aria-labelledby="task-list-title">
-      <div className="flex items-start justify-between gap-3">
+      <div className="task-list-head">
         <div>
           <div id="task-list-title" className="panel-title"><Flag size={18} />当前任务列表</div>
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">{doneTasks.length}/{tasks.length} 已完成 · 今日有效 {effectiveTodayRecords.length} 轮。</p>
+          <p>{doneTasks.length}/{tasks.length} 已完成 · 今日有效 {effectiveTodayRecords.length} 轮。</p>
         </div>
       </div>
 
-      <div className="quick-add mt-4">
-        <div className="flex gap-2">
+      <div className="quick-add">
+        <div className="quick-add-row">
           <input
-            className="field min-w-0"
+            className="field"
             value={name}
             maxLength={42}
             placeholder="添加任务，例如：整理演示脚本"
@@ -141,9 +147,9 @@ export function TaskList() {
           />
           <button className="icon-button" onClick={submit} disabled={!name.trim()} aria-label="添加今日任务"><Plus size={18} /></button>
         </div>
-        <details className="mt-2">
+        <details className="task-options">
           <summary>设置类型、难度和预计番茄</summary>
-          <div className="mt-2 grid grid-cols-[1fr_1fr_92px] gap-2">
+          <div className="task-options-grid">
             <select className="field" value={category} onChange={(event) => setCategory(event.target.value as TaskCategory)} aria-label="任务类型">
               {categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             </select>
@@ -155,8 +161,8 @@ export function TaskList() {
         </details>
       </div>
 
-      <div className="mt-4 space-y-4">
-        {!tasks.length && <div className="empty-state py-6">{todayRecords.length ? '当前任务列表为空；今日专注记录已保留在复盘区。添加任务后才能开始新一轮专注。' : '添加第一个今日任务后，才能开始专注。'}</div>}
+      <div className="task-sections">
+        {!tasks.length && <div className="empty-state">{todayRecords.length ? '当前任务列表为空；今日专注记录已保留在复盘区。添加任务后才能开始新一轮专注。' : '添加第一个今日任务后，才能开始专注。'}</div>}
         <TaskSection title="正在进行" tasks={activeTask} currentTaskId={currentTaskId} locked={isLocked} />
         <TaskSection title="待开始" tasks={todoTasks} currentTaskId={currentTaskId} locked={isLocked} />
         <TaskSection title="已完成" tasks={doneTasks} currentTaskId={currentTaskId} locked={isLocked} collapsible />
@@ -164,4 +170,3 @@ export function TaskList() {
     </section>
   );
 }
-

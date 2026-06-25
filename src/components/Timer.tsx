@@ -17,6 +17,15 @@ function phaseLabel(mode: string) {
   return '专注';
 }
 
+function nextStageText(mode: string, cycleIndex: number, settings: { breakMinutes: number; longBreakMinutes: number; roundsBeforeLongBreak: number }) {
+  if (mode === 'longBreak') return '休息后回到第 1 轮专注';
+  if (mode === 'shortBreak' || mode === 'break') return `休息后进入第 ${(cycleIndex % settings.roundsBeforeLongBreak) + 1} 轮专注`;
+  const nextCompleted = cycleIndex + 1;
+  return nextCompleted % settings.roundsBeforeLongBreak === 0
+    ? `长休息 ${settings.longBreakMinutes} 分钟`
+    : `短休息 ${settings.breakMinutes} 分钟`;
+}
+
 export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
   const timer = usePomodoroStore((state) => state.timer);
   const settings = usePomodoroStore((state) => state.settings);
@@ -34,12 +43,13 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
 
   const selectedTask = tasks.find((task) => task.id === currentTaskId && task.status !== 'done');
   const suggestion = adaptiveSuggestion();
-  const taskProgressText = selectedTask ? `${selectedTask.completedPomodoros}/${selectedTask.estimatePomodoros} 番茄` : '';
+  const taskProgressText = selectedTask ? `${selectedTask.completedPomodoros}/${selectedTask.estimatePomodoros} 番茄` : '未绑定任务';
   const isBreak = timer.mode === 'shortBreak' || timer.mode === 'longBreak' || timer.mode === 'break';
   const activeTaskName = selectedTask?.name ?? '';
   const canStart = isBreak || activeTaskName.trim().length > 0;
   const color = isSprint ? '#EF4444' : isBreak ? '#16A34A' : '#2563EB';
   const statusText = timer.status === 'running' ? '进行中' : timer.status === 'paused' ? '已暂停' : timer.status === 'completed' ? '待复盘' : '待开始';
+  const nextStage = nextStageText(timer.mode, timer.cycleIndex, settings);
 
   const handleStart = async () => {
     if (!canStart) return;
@@ -69,29 +79,42 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
         <span>{settings.focusMinutes}/{settings.breakMinutes}/{settings.longBreakMinutes} 分钟</span>
       </div>
 
-      <div className="relative mx-auto mt-3 aspect-square w-full max-w-[300px] sm:max-w-[350px] xl:max-w-[380px]">
+      <div className="timer-ring">
         <motion.div
-          className="absolute inset-0 rounded-full"
+          className="timer-ring-glow"
           animate={{ boxShadow: isSprint ? '0 0 42px rgba(239,68,68,0.18)' : isBreak ? '0 0 34px rgba(22,163,74,0.14)' : '0 0 38px rgba(37,99,235,0.16)' }}
         />
         <ProgressRing progress={progress} color={color} />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isSprint ? 'bg-red-500/12 text-red-600 dark:text-red-300' : 'bg-white/70 text-slate-600 shadow-sm dark:bg-white/10 dark:text-slate-300'}`}>{isSprint ? '冲刺' : phaseLabel(timer.mode)}</span>
+        <div className="timer-ring-content">
+          <span className={`timer-phase-badge ${isSprint ? 'sprint' : ''}`}>{isSprint ? '冲刺' : phaseLabel(timer.mode)}</span>
           <motion.div
-            className={`mt-4 font-display font-black tabular-nums leading-none ${isSprint ? 'text-5xl text-red-500 sm:text-6xl' : 'text-5xl text-slate-950 dark:text-white sm:text-6xl'}`}
+            className={`timer-time ${isSprint ? 'sprint' : ''}`}
             animate={{ scale: isSprint ? [1, 1.05, 1] : 1 }}
             transition={{ duration: 1, repeat: isSprint ? Infinity : 0 }}
           >
             {formatTimer(remainingMs, timer.status === 'running')}
           </motion.div>
-          <p className="mt-3 max-w-64 truncate text-sm font-semibold text-slate-600 dark:text-slate-200">{isBreak ? '恢复一下，下一轮会更稳。' : activeTaskName || '请先选择或创建一个任务'}</p>
-          {!isBreak && taskProgressText && <p className="mt-1 text-xs font-bold text-blue-700 dark:text-blue-200">当前任务进度：{taskProgressText}</p>}
+        </div>
+      </div>
+
+      <div className={`timer-current-task ${!activeTaskName && !isBreak ? 'empty' : ''}`} aria-live="polite">
+        <div>
+          <span>当前任务</span>
+          <strong>{isBreak ? '休息恢复' : activeTaskName || '请先选择或创建一个任务'}</strong>
+        </div>
+        <div>
+          <span>任务进度</span>
+          <strong>{isBreak ? '本轮不计任务' : taskProgressText}</strong>
+        </div>
+        <div>
+          <span>下一阶段</span>
+          <strong>{nextStage}</strong>
         </div>
       </div>
 
       <FocusCycleProgress />
 
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+      <div className="timer-actions">
         {timer.status === 'idle' && (
           <>
             <button className="primary-button" onClick={handleStart} disabled={!canStart} title={!canStart ? '请先选择或创建一个任务' : isBreak ? '开始休息' : '开始标准番茄'}>
@@ -138,7 +161,7 @@ export function Timer({ remainingMs, progress, isSprint }: TimerProps) {
         </button>
       </div>
       {!isBreak && activeTaskName && timer.status === 'idle' && (
-        <p className="mt-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-300">{suggestion.reason}</p>
+        <p className="timer-suggestion">{suggestion.reason}</p>
       )}
     </section>
   );

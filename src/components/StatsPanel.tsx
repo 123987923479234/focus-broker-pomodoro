@@ -43,6 +43,14 @@ function reviewConclusion(params: { totalRecords: number; effectiveCount: number
   return '今天还没有形成有效番茄。建议先选择一个明确任务，并完成 1 个完整专注轮次。';
 }
 
+function nextActionSuggestion(params: { hasTasks: boolean; effectiveCount: number; ineffectiveCount: number; weeklyGap: number; topCategory?: string }) {
+  const { hasTasks, effectiveCount, ineffectiveCount, weeklyGap, topCategory } = params;
+  if (!hasTasks) return '下一步：先添加一个今天要推进的具体任务，再开始第一轮专注。';
+  if (effectiveCount === 0 && ineffectiveCount > 0) return '下一步：把刚才的启动记录转化为完整轮次，先完成 1 个达到有效标准的番茄。';
+  if (effectiveCount === 0) return '下一步：选择当前任务，完成 1 个完整专注轮次，让今日统计产生可信样本。';
+  if (weeklyGap > 0) return `下一步：再安排 1-2 轮专注，优先推进${topCategory ? ` ${topCategory} 类` : ''}任务，距离本周基础目标还差 ${weeklyGap} 分钟。`;
+  return '下一步：本周基础目标已达成，建议复盘中断原因并归档已完成任务。';
+}
 export function StatsPanel() {
   const records = usePomodoroStore((state) => state.records);
   const tasks = usePomodoroStore((state) => state.tasks);
@@ -88,12 +96,20 @@ export function StatsPanel() {
     completedTasks,
     topCategory,
   });
+  const nextAction = nextActionSuggestion({
+    hasTasks: hasCurrentTasks,
+    effectiveCount: effectiveTodayRecords.length,
+    ineffectiveCount: ineffectiveTodayRecords.length,
+    weeklyGap,
+    topCategory,
+  });
 
   return (
     <section className="panel stats-panel" aria-labelledby="stats-panel-title">
       <div className="review-report-head">
         <div id="stats-panel-title" className="panel-title"><BarChart3 size={18} />今日复盘</div>
         <p className="review-conclusion">{conclusion}</p>
+        <p className="review-action">{nextAction}</p>
         {!hasCurrentTasks && todayRecords.length > 0 && (
           <p className="review-note">当前任务列表为空；统计来自今日历史记录。删除任务不会删除历史记录。</p>
         )}

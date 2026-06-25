@@ -7,7 +7,7 @@ export function useBroadcastSync() {
 
   useEffect(() => {
     if (!('BroadcastChannel' in window)) return;
-    const channel = new BroadcastChannel('luxury-pomodoro-sync');
+    const channel = new BroadcastChannel('focus-broker-sync');
     channel.postMessage({ type: 'snapshot', currentTask, timer });
     return () => channel.close();
   }, [currentTask, timer]);

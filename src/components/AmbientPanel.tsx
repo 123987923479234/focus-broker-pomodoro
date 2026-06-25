@@ -18,7 +18,8 @@ export function AmbientPanel() {
   const settings = usePomodoroStore((state) => state.settings);
   const setSettings = usePomodoroStore((state) => state.setSettings);
   const activeAudio = settings.audioScene ?? 'rainKeyboard';
-  const audioLabel = settings.whiteNoiseEnabled && activeAudio !== 'none'
+  const muted = !settings.whiteNoiseEnabled || activeAudio === 'none';
+  const audioLabel = !muted
     ? audioScenes.find((scene) => scene.value === activeAudio)?.label ?? '雨声 + 键盘'
     : '静音';
   const themeLabel = themeOptions.find((option) => option.value === settings.themeMode)?.label ?? '系统';
@@ -29,19 +30,14 @@ export function AmbientPanel() {
 
   return (
     <section className="panel ambient-panel" aria-labelledby="ambient-panel-title">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+      <div className="ambient-toolbar">
+        <div className="ambient-heading">
           <div id="ambient-panel-title" className="panel-title"><Headphones size={18} />专注环境</div>
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">保留必要声音与显示设置，减少额外干扰。</p>
+          <p>必要声音与显示设置，保持低干扰。</p>
         </div>
-        <button className="ghost-button h-9 min-h-9 px-3" onClick={() => setSettings({ ambienceExpanded: !settings.ambienceExpanded })}>
-          <Settings2 size={16} />{settings.ambienceExpanded ? '收起' : '环境设置'}
-        </button>
-      </div>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        <div className="ambient-summary"><span>声音</span><strong>{audioLabel}</strong></div>
-        <label className={`ambient-summary ${(!settings.whiteNoiseEnabled || activeAudio === 'none') ? 'opacity-55' : ''}`}>
+        <div className="ambient-control"><span>声音</span><strong>{audioLabel}</strong></div>
+        <label className={`ambient-control volume ${muted ? 'muted' : ''}`}>
           <span>音量</span>
           <input
             type="range"
@@ -49,23 +45,25 @@ export function AmbientPanel() {
             max={0.9}
             step={0.01}
             value={settings.baseVolume}
-            disabled={!settings.whiteNoiseEnabled || activeAudio === 'none'}
+            disabled={muted}
             onChange={(event) => setSettings({ baseVolume: Number(event.target.value) })}
-            className="mt-2 w-full accent-blue-600"
             aria-label="音量"
           />
         </label>
-        <div className="ambient-summary"><span>主题</span><strong>{themeLabel}</strong></div>
+        <div className="ambient-control"><span>主题</span><strong>{themeLabel}</strong></div>
+        <button className="ghost-button ambient-settings-button" onClick={() => setSettings({ ambienceExpanded: !settings.ambienceExpanded })}>
+          <Settings2 size={16} />{settings.ambienceExpanded ? '收起' : '环境设置'}
+        </button>
       </div>
 
       {settings.ambienceExpanded && (
-        <div className="mt-4 grid gap-4 border-t border-white/[0.35] pt-4 dark:border-white/10 lg:grid-cols-[1fr_0.8fr]">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
+        <div className="ambient-drawer">
+          <div>
+            <div className="ambient-section-head">
               <span>合成声音</span>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-300">开始专注后播放</span>
+              <small>开始专注后播放</small>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2" role="group" aria-label="声音选择">
+            <div className="sound-grid" role="group" aria-label="声音选择">
               {audioScenes.map((scene) => {
                 const Icon = scene.icon;
                 const active = activeAudio === scene.value && (scene.value === 'none' || settings.whiteNoiseEnabled);
@@ -86,8 +84,8 @@ export function AmbientPanel() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">主题模式</div>
+          <div>
+            <div className="ambient-section-head"><span>主题模式</span></div>
             <div className="segmented" role="group" aria-label="主题模式">
               {themeOptions.map((option) => (
                 <button
