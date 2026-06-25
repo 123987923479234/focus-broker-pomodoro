@@ -1071,21 +1071,21 @@
   transform: none !important;
 }
 
-.scene-focusDefault {
+.default-focus-bg {
   background:
     radial-gradient(circle at 18% 10%, rgba(37, 99, 235, 0.11), transparent 30rem),
     radial-gradient(circle at 78% 4%, rgba(14, 165, 233, 0.07), transparent 28rem),
     linear-gradient(180deg, #eef5f8 0%, #e8f1f5 58%, #dde9f0 100%);
 }
 
-.scene-focusDefault::before,
-.scene-focusDefault::after {
+.default-focus-bg::before,
+.default-focus-bg::after {
   content: '';
   position: absolute;
   pointer-events: none;
 }
 
-.scene-focusDefault::before {
+.default-focus-bg::before {
   inset: 10% 8% auto;
   height: 34%;
   border-radius: 999px;
@@ -1094,7 +1094,7 @@
   opacity: 0.34;
 }
 
-.scene-focusDefault::after {
+.default-focus-bg::after {
   left: -10%;
   right: -10%;
   bottom: -12%;
@@ -1105,7 +1105,7 @@
   opacity: 0.22;
 }
 
-.dark .scene-focusDefault {
+.dark .default-focus-bg {
   background:
     radial-gradient(circle at 16% 8%, rgba(37, 99, 235, 0.18), transparent 30rem),
     radial-gradient(circle at 86% 8%, rgba(14, 165, 233, 0.10), transparent 28rem),

@@ -32,7 +32,7 @@ export function AmbientPanel() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <div id="ambient-panel-title" className="panel-title"><Headphones size={18} />专注环境</div>
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">辅助保持节奏，不抢任务和复盘的主线。</p>
+          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-300">保留必要声音与显示设置，减少额外干扰。</p>
         </div>
         <button className="ghost-button h-9 min-h-9 px-3" onClick={() => setSettings({ ambienceExpanded: !settings.ambienceExpanded })}>
           <Settings2 size={16} />{settings.ambienceExpanded ? '收起' : '环境设置'}
