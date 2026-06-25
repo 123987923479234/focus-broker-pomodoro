@@ -102,7 +102,7 @@ const defaultSettings: SettingsState = {
   themeMode: 'system',
   whiteNoiseEnabled: false,
   audioScene: 'rainKeyboard',
-  visualScene: 'blueLakeTulips',
+  visualScene: 'focusDefault',
   baseVolume: 0.36,
   whitelist: ['notion.so', 'github.com'],
 };
@@ -602,15 +602,3 @@ export function createRecordFromReview(pending: PendingReview, review: ReviewNot
     cycleIndex: pending.cycleIndex,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-

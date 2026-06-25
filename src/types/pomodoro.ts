@@ -3,7 +3,7 @@ export type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 export type Difficulty = 'simple' | 'medium' | 'hard';
 export type ThemeMode = 'system' | 'day' | 'night';
 export type TaskCategory = 'coding' | 'writing' | 'learning' | 'planning' | 'research' | 'other';
-export type VisualScene = 'blueLakeTulips' | 'mistForest' | 'rainWindow' | 'starLake';
+export type VisualScene = 'focusDefault' | 'blueLakeTulips' | 'mistForest' | 'rainWindow' | 'starLake';
 export type AudioScene = 'rainKeyboard' | 'softRain' | 'forestStream' | 'lofiPiano' | 'warmPads' | 'none';
 export type TaskStatus = 'todo' | 'active' | 'done' | 'deferred';
 export type ReviewCompletion = 'done' | 'partial' | 'missed';
@@ -89,5 +89,3 @@ export interface TimerSnapshot {
   cycleIndex: number;
   interruptions: number;
 }
-
-

@@ -1054,7 +1054,7 @@
   }
 }
 
-/* Dynamic scene classes are generated as scene-${visualScene}; keep them outside Tailwind layers so they are never purged. */
+/* Fixed low-distraction background. Experimental scene settings are kept only for old local data compatibility. */
 .scenic-bg {
   position: fixed;
   inset: 0;
@@ -1071,92 +1071,44 @@
   transform: none !important;
 }
 
-.scene-blueLakeTulips {
+.scene-focusDefault {
   background:
-    radial-gradient(circle at 22% 12%, rgba(37, 99, 235, 0.12), transparent 28rem),
-    radial-gradient(circle at 78% 4%, rgba(14, 165, 233, 0.08), transparent 26rem),
-    linear-gradient(180deg, #eef5f8 0%, #e8f1f5 56%, #dde9f0 100%);
+    radial-gradient(circle at 18% 10%, rgba(37, 99, 235, 0.11), transparent 30rem),
+    radial-gradient(circle at 78% 4%, rgba(14, 165, 233, 0.07), transparent 28rem),
+    linear-gradient(180deg, #eef5f8 0%, #e8f1f5 58%, #dde9f0 100%);
 }
 
-.scene-mistForest {
-  background:
-    radial-gradient(circle at 32% 18%, rgba(132, 204, 150, 0.24), transparent 25rem),
-    radial-gradient(circle at 78% 30%, rgba(45, 127, 111, 0.16), transparent 26rem),
-    linear-gradient(180deg, #edf8f2 0%, #e4f0ee 52%, #d8e9e5 100%);
-}
-
-.scene-rainWindow {
-  background:
-    radial-gradient(circle at 72% 18%, rgba(245, 158, 11, 0.16), transparent 18rem),
-    radial-gradient(circle at 24% 22%, rgba(96, 165, 250, 0.25), transparent 25rem),
-    linear-gradient(180deg, #e9f0fa 0%, #dfeaf4 54%, #d4e1eb 100%);
-}
-
-.scene-starLake {
-  background:
-    radial-gradient(circle at 50% 12%, rgba(129, 140, 248, 0.30), transparent 22rem),
-    radial-gradient(circle at 22% 72%, rgba(14, 165, 233, 0.18), transparent 24rem),
-    linear-gradient(180deg, #eef1ff 0%, #e6edf8 54%, #dbe6f2 100%);
-}
-
-.scenic-scene::before,
-.scenic-scene::after {
+.scene-focusDefault::before,
+.scene-focusDefault::after {
   content: '';
   position: absolute;
   pointer-events: none;
 }
 
-.scenic-scene::before {
-  inset: 12% 8% auto;
-  height: 38%;
-  border-radius: 999px;
-  filter: blur(38px);
-  opacity: 0.32;
-}
-
-.scenic-scene::after {
-  left: -8%;
-  right: -8%;
-  bottom: -10%;
+.scene-focusDefault::before {
+  inset: 10% 8% auto;
   height: 34%;
-  filter: blur(18px);
-  opacity: 0.24;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.13), rgba(14, 165, 233, 0.06));
+  filter: blur(42px);
+  opacity: 0.34;
 }
 
-.scene-blueLakeTulips::before { background: linear-gradient(90deg, rgba(37, 99, 235, 0.20), rgba(14, 165, 233, 0.06)); }
-.scene-blueLakeTulips::after { background: linear-gradient(180deg, rgba(37, 99, 235, 0.08), rgba(14, 165, 233, 0.06)); }
-.scene-mistForest::before { background: linear-gradient(90deg, rgba(22, 163, 74, 0.18), rgba(20, 184, 166, 0.12)); }
-.scene-mistForest::after { background: linear-gradient(180deg, rgba(74, 222, 128, 0.16), rgba(15, 118, 110, 0.09)); }
-.scene-rainWindow::before { background: linear-gradient(90deg, rgba(59, 130, 246, 0.18), rgba(245, 158, 11, 0.12)); }
-.scene-rainWindow::after { background: linear-gradient(180deg, rgba(71, 85, 105, 0.14), rgba(37, 99, 235, 0.09)); }
-.scene-starLake::before { background: linear-gradient(90deg, rgba(79, 70, 229, 0.22), rgba(14, 165, 233, 0.12)); }
-.scene-starLake::after { background: linear-gradient(180deg, rgba(99, 102, 241, 0.16), rgba(14, 165, 233, 0.10)); }
-
-.dark .scene-blueLakeTulips {
-  background:
-    radial-gradient(circle at 42% 14%, rgba(59, 130, 246, 0.22), transparent 26rem),
-    radial-gradient(circle at 20% 78%, rgba(236, 72, 153, 0.10), transparent 22rem),
-    #07111f;
+.scene-focusDefault::after {
+  left: -10%;
+  right: -10%;
+  bottom: -12%;
+  height: 32%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.07), rgba(14, 165, 233, 0.04));
+  filter: blur(24px);
+  opacity: 0.22;
 }
 
-.dark .scene-mistForest {
+.dark .scene-focusDefault {
   background:
-    radial-gradient(circle at 34% 18%, rgba(34, 197, 94, 0.18), transparent 25rem),
-    radial-gradient(circle at 78% 28%, rgba(20, 184, 166, 0.12), transparent 26rem),
-    #07111f;
-}
-
-.dark .scene-rainWindow {
-  background:
-    radial-gradient(circle at 72% 18%, rgba(245, 158, 11, 0.12), transparent 18rem),
-    radial-gradient(circle at 24% 22%, rgba(59, 130, 246, 0.18), transparent 25rem),
-    #07111f;
-}
-
-.dark .scene-starLake {
-  background:
-    radial-gradient(circle at 50% 12%, rgba(99, 102, 241, 0.24), transparent 22rem),
-    radial-gradient(circle at 22% 72%, rgba(14, 165, 233, 0.13), transparent 24rem),
+    radial-gradient(circle at 16% 8%, rgba(37, 99, 235, 0.18), transparent 30rem),
+    radial-gradient(circle at 86% 8%, rgba(14, 165, 233, 0.10), transparent 28rem),
     #07111f;
 }
 
@@ -1165,7 +1117,7 @@
   inset: 0;
   background:
     linear-gradient(180deg, rgba(238, 245, 248, 0.58), rgba(238, 245, 248, 0.36) 46%, rgba(238, 245, 248, 0.66)),
-    radial-gradient(ellipse at 50% 22%, rgba(255, 255, 255, 0.24), transparent 34rem);
+    radial-gradient(ellipse at 50% 22%, rgba(255, 255, 255, 0.22), transparent 34rem);
   backdrop-filter: blur(0.8px);
 }
 
