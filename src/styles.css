@@ -702,28 +702,6 @@
     border-color: rgba(120, 140, 160, 0.16);
   }
 
-  .ambient-summary {
-    min-height: 54px;
-    border: 1px solid rgba(120, 140, 160, 0.14);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.50);
-    padding: 9px 11px;
-  }
-
-  .ambient-summary span {
-    display: block;
-    color: var(--fb-muted);
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .ambient-summary strong {
-    display: block;
-    margin-top: 2px;
-    color: var(--fb-ink);
-    font-size: 13px;
-    font-weight: 700;
-  }
 
   .sound-choice {
     border: 1px solid rgba(120, 140, 160, 0.15);
@@ -916,7 +894,6 @@
   .dark .task-actions button,
   .dark .stat-card,
   .dark .stats-chart,
-  .dark .ambient-summary,
   .dark .sound-choice,
   .dark .chip,
   .dark .record-card,
@@ -933,7 +910,6 @@
   .dark .task-main,
   .dark .task-main strong,
   .dark .stat-card strong,
-  .dark .ambient-summary strong,
   .dark .sound-choice span,
   .dark .stats-chart h3,
   .dark .analytics-block h3,
@@ -945,7 +921,6 @@
   .dark .task-main small,
   .dark .task-state,
   .dark .stat-card span,
-  .dark .ambient-summary span,
   .dark .sound-choice small,
   .dark .metric span,
   .dark .setting-toggle small,
@@ -1336,15 +1311,6 @@
     padding: 12px 14px;
   }
 
-  .ambient-summary {
-    min-height: 48px;
-    background: rgba(255, 255, 255, 0.68);
-    padding: 8px 10px;
-  }
-
-  .ambient-summary strong {
-    font-weight: 680;
-  }
 
   .sound-choice {
     min-height: 60px;
@@ -1388,7 +1354,6 @@
   .dark .task-actions button,
   .dark .stat-card,
   .dark .stats-chart,
-  .dark .ambient-summary,
   .dark .sound-choice,
   .dark .empty-state,
   .dark .empty-chart,
@@ -1513,9 +1478,6 @@
     margin-top: 10px;
   }
 
-  .ambient-summary {
-    min-height: 42px;
-  }
 
   .sound-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1790,7 +1752,7 @@
   }
 
   .task-actions > button,
-  .task-more summary,
+  .task-more-trigger,
   .task-more-menu button {
     display: inline-flex;
     min-height: 28px;
@@ -1814,15 +1776,9 @@
     position: relative;
   }
 
-  .task-more summary {
+  .task-more-trigger {
     cursor: pointer;
-    list-style: none;
   }
-
-  .task-more summary::-webkit-details-marker {
-    display: none;
-  }
-
   .task-more-menu {
     position: absolute;
     right: 0;
@@ -1843,6 +1799,143 @@
     width: 100%;
     border-color: transparent;
     background: transparent;
+  }
+
+  .task-card,
+  .task-list-panel {
+    overflow: visible;
+  }
+
+  .task-more-trigger {
+    cursor: pointer;
+  }
+
+  .task-more-trigger[aria-expanded="true"] {
+    border-color: rgba(37, 99, 235, 0.24);
+    background: var(--fb-primary-soft);
+    color: var(--fb-primary);
+  }
+
+  .task-more-menu button:hover:not(:disabled),
+  .task-more-menu button:focus-visible:not(:disabled) {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--fb-primary);
+  }
+
+  .task-more-menu button:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  .task-more-menu button.danger {
+    color: #b91c1c;
+  }
+
+  .task-more-menu button.danger:hover:not(:disabled),
+  .task-more-menu button.danger:focus-visible:not(:disabled) {
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--fb-danger);
+  }
+
+  .settings-layout {
+    display: grid;
+    gap: 14px;
+  }
+
+  .settings-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    border: 1px solid rgba(245, 158, 11, 0.24);
+    border-radius: 14px;
+    background: rgba(245, 158, 11, 0.09);
+    padding: 10px 12px;
+    color: #8a4f00;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .settings-group {
+    display: grid;
+    gap: 10px;
+    border: 1px solid rgba(120, 140, 160, 0.14);
+    border-radius: 16px;
+    background: rgba(248, 251, 253, 0.70);
+    padding: 13px;
+  }
+
+  .settings-group h3 {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    color: var(--fb-text);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .settings-group p {
+    margin: 0;
+    color: var(--fb-muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .settings-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .settings-grid.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-grid.four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .settings-grid label {
+    display: grid;
+    gap: 6px;
+    color: var(--fb-muted);
+    font-size: 12px;
+    font-weight: 620;
+  }
+
+  .settings-inline-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .settings-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .settings-chips .chip button {
+    display: inline-flex;
+    border: 0;
+    background: transparent;
+    color: inherit;
+  }
+
+  .data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ghost-button.danger {
+    border-color: rgba(239, 68, 68, 0.22);
+    color: #b91c1c;
+  }
+
+  .ghost-button.danger:hover,
+  .ghost-button.danger:focus-visible {
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--fb-danger);
   }
 
   .break-guide {
@@ -1974,6 +2067,7 @@
 
   .ambient-control.volume.muted input {
     filter: grayscale(1);
+    cursor: not-allowed;
   }
 
   .ambient-settings-button {
@@ -2086,10 +2180,25 @@
 
   .dark .timer-phase-badge,
   .dark .task-actions > button,
-  .dark .task-more summary,
+  .dark .task-more-trigger,
   .dark .task-more-menu button,
   .dark .ambient-control {
     background: rgba(255, 255, 255, 0.07);
+  }
+
+  .dark .settings-group {
+    background: rgba(15, 29, 50, 0.72);
+    border-color: rgba(148, 163, 184, 0.16);
+  }
+
+  .dark .settings-warning {
+    background: rgba(245, 158, 11, 0.11);
+    border-color: rgba(245, 158, 11, 0.24);
+    color: #f8d18a;
+  }
+
+  .dark .ghost-button.danger {
+    color: #fca5a5;
   }
 
   .dark .modal-backdrop {
@@ -2097,6 +2206,15 @@
   }
 }
 
+@media (max-width: 1180px) and (min-width: 901px) {
+  .ambient-toolbar {
+    grid-template-columns: minmax(220px, 1fr) minmax(120px, 0.6fr) minmax(220px, 1fr);
+  }
+
+  .ambient-settings-button {
+    justify-self: start;
+  }
+}
 @media (max-width: 900px) {
   .timer-ring {
     width: min(66vw, 236px);
@@ -2138,11 +2256,19 @@
   .task-options-grid {
     grid-template-columns: 1fr;
   }
+  .settings-grid.two,
+  .settings-grid.four {
+    grid-template-columns: 1fr;
+  }
+
+  .data-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
 
   .task-actions {
     flex-wrap: wrap;
   }
-
   .task-more-menu {
     right: auto;
     left: 0;

@@ -67,6 +67,9 @@ interface PomodoroStore {
   setSettings: (settings: Partial<SettingsState>) => void;
   addWhitelistSite: (site: string) => void;
   removeWhitelistSite: (site: string) => void;
+  clearTodayTasks: () => void;
+  clearHistoryState: () => void;
+  resetLocalWorkspace: () => void;
   setRecords: (records: PomodoroRecord[]) => void;
   addRecord: (record: PomodoroRecord) => void;
   setFilters: (filters: Partial<HistoryFilters>) => void;
@@ -400,6 +403,29 @@ export const usePomodoroStore = create<PomodoroStore>()(
       removeWhitelistSite: (site) => set((state) => ({
         settings: { ...state.settings, whitelist: state.settings.whitelist.filter((item) => item !== site) },
       })),
+      clearTodayTasks: () => set({
+        tasks: [],
+        currentTaskId: null,
+        currentTask: defaultTask,
+        timer: createIdleTimer(get().settings.focusMinutes),
+        pendingReview: null,
+        energySeries: [],
+      }),
+      clearHistoryState: () => set({ records: [] }),
+      resetLocalWorkspace: () => set({
+        timer: createIdleTimer(defaultSettings.focusMinutes),
+        settings: defaultSettings,
+        tasks: [],
+        currentTaskId: null,
+        currentTask: defaultTask,
+        currentEnergy: 7,
+        energySeries: [],
+        pendingReview: null,
+        records: [],
+        filters: { date: '', category: 'all', minMinutes: 0 },
+        activeModal: null,
+        isImmersive: false,
+      }),
       setRecords: (records) => set({ records }),
       addRecord: (record) => set((state) => ({ records: [record, ...state.records] })),
       setFilters: (filters) => set((state) => ({ filters: { ...state.filters, ...filters } })),

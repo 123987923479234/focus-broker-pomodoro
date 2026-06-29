@@ -1,5 +1,5 @@
 import { CheckCircle2, ChevronDown, ChevronUp, Circle, Flag, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { categoryLabel, difficultyLabel } from '../lib/format';
 import { isEffectivePomodoro } from '../lib/pomodoroRules';
 import { usePomodoroStore } from '../store/usePomodoroStore';
@@ -24,17 +24,41 @@ function taskProgress(task: TodayTask) {
   return Math.min(100, Math.round((task.completedPomodoros / Math.max(1, task.estimatePomodoros)) * 100));
 }
 
-function TaskItem({ task, index, total, selected, locked }: { task: TodayTask; index: number; total: number; selected: boolean; locked: boolean }) {
+interface TaskItemProps {
+  task: TodayTask;
+  index: number;
+  total: number;
+  selected: boolean;
+  locked: boolean;
+  openMenuId: string | null;
+  setOpenMenuId: (id: string | null) => void;
+}
+
+function TaskItem({ task, index, total, selected, locked, openMenuId, setOpenMenuId }: TaskItemProps) {
   const selectTask = usePomodoroStore((state) => state.selectTask);
   const updateTask = usePomodoroStore((state) => state.updateTask);
   const deleteTask = usePomodoroStore((state) => state.deleteTask);
   const markTaskDone = usePomodoroStore((state) => state.markTaskDone);
   const reorderTask = usePomodoroStore((state) => state.reorderTask);
   const [editing, setEditing] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuOpen = openMenuId === task.id;
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnOutside = (event: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutside);
+    return () => document.removeEventListener('pointerdown', closeOnOutside);
+  }, [menuOpen, setOpenMenuId]);
 
   const confirmDelete = () => {
     if (window.confirm('删除任务只会移出当前任务列表，历史专注记录会保留用于统计。是否继续？')) {
       deleteTask(task.id);
+      setOpenMenuId(null);
     }
   };
 
@@ -63,21 +87,35 @@ function TaskItem({ task, index, total, selected, locked }: { task: TodayTask; i
       <div className="task-actions">
         {task.status !== 'done' && <button className="task-action-primary" onClick={() => selectTask(task.id)} disabled={locked || selected}>设为当前</button>}
         {task.status !== 'done' && <button onClick={() => markTaskDone(task.id)} disabled={locked}>完成</button>}
-        <details className="task-more">
-          <summary aria-label="更多任务操作" title="更多任务操作"><MoreHorizontal size={16} /><span>更多</span></summary>
-          <div className="task-more-menu">
-            {task.status !== 'done' && <button onClick={() => setEditing((value) => !value)} disabled={locked}><Pencil size={14} />{editing ? '收起编辑' : '编辑'}</button>}
-            {task.status !== 'done' && <button onClick={() => reorderTask(task.id, -1)} disabled={index === 0 || locked}><ChevronUp size={14} />上移</button>}
-            {task.status !== 'done' && <button onClick={() => reorderTask(task.id, 1)} disabled={index === total - 1 || locked}><ChevronDown size={14} />下移</button>}
-            <button onClick={confirmDelete} disabled={locked}><Trash2 size={14} />删除</button>
-          </div>
-        </details>
+        <div className="task-more" ref={menuRef}>
+          <button type="button" className="task-more-trigger" aria-expanded={menuOpen} aria-label="更多任务操作" title="更多任务操作" onClick={() => setOpenMenuId(menuOpen ? null : task.id)}>
+            <MoreHorizontal size={16} /><span>更多</span>
+          </button>
+          {menuOpen && (
+            <div className="task-more-menu" role="menu">
+              {task.status !== 'done' && <button role="menuitem" onClick={() => setEditing((value) => !value)} disabled={locked}><Pencil size={14} />{editing ? '收起编辑' : '编辑'}</button>}
+              {task.status !== 'done' && <button role="menuitem" onClick={() => reorderTask(task.id, -1)} disabled={index === 0 || locked}><ChevronUp size={14} />上移</button>}
+              {task.status !== 'done' && <button role="menuitem" onClick={() => reorderTask(task.id, 1)} disabled={index === total - 1 || locked}><ChevronDown size={14} />下移</button>}
+              <button role="menuitem" className="danger" onClick={confirmDelete} disabled={locked}><Trash2 size={14} />删除</button>
+            </div>
+          )}
+        </div>
       </div>
     </article>
   );
 }
 
-function TaskSection({ title, tasks, currentTaskId, locked, collapsible = false }: { title: string; tasks: TodayTask[]; currentTaskId: string | null; locked: boolean; collapsible?: boolean }) {
+interface TaskSectionProps {
+  title: string;
+  tasks: TodayTask[];
+  currentTaskId: string | null;
+  locked: boolean;
+  openMenuId: string | null;
+  setOpenMenuId: (id: string | null) => void;
+  collapsible?: boolean;
+}
+
+function TaskSection({ title, tasks, currentTaskId, locked, openMenuId, setOpenMenuId, collapsible = false }: TaskSectionProps) {
   const [open, setOpen] = useState(!collapsible);
   if (!tasks.length) return null;
 
@@ -94,7 +132,7 @@ function TaskSection({ title, tasks, currentTaskId, locked, collapsible = false 
       {open && (
         <div className="task-section-list">
           {tasks.map((task, index) => (
-            <TaskItem key={task.id} task={task} index={index} total={tasks.length} selected={task.id === currentTaskId} locked={locked} />
+            <TaskItem key={task.id} task={task} index={index} total={tasks.length} selected={task.id === currentTaskId} locked={locked} openMenuId={openMenuId} setOpenMenuId={setOpenMenuId} />
           ))}
         </div>
       )}
@@ -113,6 +151,7 @@ export function TaskList() {
   const [category, setCategory] = useState<TaskCategory>('coding');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [estimate, setEstimate] = useState(2);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const isLocked = timer.status === 'running' && timer.mode === 'focus';
   const activeTask = tasks.filter((task) => task.status !== 'done' && task.id === currentTaskId);
   const todoTasks = tasks.filter((task) => task.status !== 'done' && task.id !== currentTaskId);
@@ -163,9 +202,9 @@ export function TaskList() {
 
       <div className="task-sections">
         {!tasks.length && <div className="empty-state">{todayRecords.length ? '当前任务列表为空；今日专注记录已保留在复盘区。添加任务后才能开始新一轮专注。' : '添加第一个今日任务后，才能开始专注。'}</div>}
-        <TaskSection title="正在进行" tasks={activeTask} currentTaskId={currentTaskId} locked={isLocked} />
-        <TaskSection title="待开始" tasks={todoTasks} currentTaskId={currentTaskId} locked={isLocked} />
-        <TaskSection title="已完成" tasks={doneTasks} currentTaskId={currentTaskId} locked={isLocked} collapsible />
+        <TaskSection title="正在进行" tasks={activeTask} currentTaskId={currentTaskId} locked={isLocked} openMenuId={openMenuId} setOpenMenuId={setOpenMenuId} />
+        <TaskSection title="待开始" tasks={todoTasks} currentTaskId={currentTaskId} locked={isLocked} openMenuId={openMenuId} setOpenMenuId={setOpenMenuId} />
+        <TaskSection title="已完成" tasks={doneTasks} currentTaskId={currentTaskId} locked={isLocked} openMenuId={openMenuId} setOpenMenuId={setOpenMenuId} collapsible />
       </div>
     </section>
   );
