@@ -2283,3 +2283,113 @@
     padding: 18px 10px;
   }
 }
+
+/* Header */
+.notification-banner {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+  border: 1px solid rgba(245, 158, 11, 0.24);
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.09);
+  padding: 10px 12px;
+  color: #8a4f00;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.notification-banner span {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-banner button {
+  display: inline-flex;
+  min-width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(245, 158, 11, 0.20);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.48);
+  color: inherit;
+}
+
+/* Settings */
+.data-management {
+  border-color: rgba(239, 68, 68, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.data-lock-note,
+.data-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.data-lock-note,
+.data-message.warning {
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  background: rgba(245, 158, 11, 0.09);
+  color: #8a4f00;
+}
+
+.data-message.success {
+  border: 1px solid rgba(22, 163, 74, 0.18);
+  background: rgba(22, 163, 74, 0.08);
+  color: #166534;
+}
+
+.data-message.error {
+  border: 1px solid rgba(239, 68, 68, 0.20);
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+}
+
+.data-actions .danger {
+  border-color: rgba(239, 68, 68, 0.24);
+}
+
+.dark .notification-banner,
+.dark .data-lock-note,
+.dark .data-message.warning {
+  background: rgba(245, 158, 11, 0.11);
+  border-color: rgba(245, 158, 11, 0.24);
+  color: #f8d18a;
+}
+
+.dark .data-management {
+  background: rgba(15, 29, 50, 0.78);
+}
+
+.dark .data-message.success {
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(74, 222, 128, 0.20);
+  color: #bbf7d0;
+}
+
+.dark .data-message.error {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(248, 113, 113, 0.22);
+  color: #fecaca;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .notification-banner {
+    align-items: flex-start;
+  }
+
+  .data-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

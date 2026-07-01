@@ -74,6 +74,10 @@ export async function listPomodoroRecords() {
   return records.sort((a, b) => b.endedAt - a.endedAt);
 }
 
+export async function savePomodoroRecords(records: PomodoroRecord[]) {
+  const db = await openPomodoroDB();
+  await Promise.all(records.map((record) => transaction(db, 'readwrite', (store) => store.put(record))));
+}
 export async function clearPomodoroRecords() {
   const db = await openPomodoroDB();
   await transaction(db, 'readwrite', (store) => store.clear());

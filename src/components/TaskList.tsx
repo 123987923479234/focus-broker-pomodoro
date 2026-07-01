@@ -51,8 +51,15 @@ function TaskItem({ task, index, total, selected, locked, openMenuId, setOpenMen
         setOpenMenuId(null);
       }
     };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpenMenuId(null);
+    };
     document.addEventListener('pointerdown', closeOnOutside);
-    return () => document.removeEventListener('pointerdown', closeOnOutside);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutside);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
   }, [menuOpen, setOpenMenuId]);
 
   const confirmDelete = () => {

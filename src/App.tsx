@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, History, Settings } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { AlertTriangle, BarChart3, History, Settings, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { AmbientPanel } from './components/AmbientPanel';
 import { AnalyticsModal } from './components/AnalyticsModal';
 import { BreathGuide } from './components/BreathGuide';
@@ -26,6 +26,38 @@ import { useThemeMode } from './hooks/useThemeMode';
 import { useTimerEffects } from './hooks/useTimerEffects';
 import { useWhiteNoise } from './hooks/useWhiteNoise';
 import { usePomodoroStore } from './store/usePomodoroStore';
+
+function notificationPermission() {
+  if (typeof window === 'undefined' || !('Notification' in window)) return 'unsupported';
+  return Notification.permission;
+}
+
+function NotificationDeniedBanner() {
+  const notificationsEnabled = usePomodoroStore((state) => state.settings.notificationsEnabled);
+  const [permission, setPermission] = useState(notificationPermission);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    const update = () => setPermission(notificationPermission());
+    update();
+    window.addEventListener('focus', update);
+    document.addEventListener('visibilitychange', update);
+    return () => {
+      window.removeEventListener('focus', update);
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, [notificationsEnabled]);
+
+  if (!notificationsEnabled || permission !== 'denied' || dismissed) return null;
+
+  return (
+    <div className="notification-banner" role="status">
+      <AlertTriangle size={16} />
+      <span>通知权限已关闭，阶段结束不会弹出提醒。可在浏览器设置中重新开启。</span>
+      <button type="button" onClick={() => setDismissed(true)} aria-label="关闭通知提示"><X size={15} /></button>
+    </div>
+  );
+}
 
 function modalTitle(activeModal: ReturnType<typeof usePomodoroStore.getState>['activeModal']) {
   if (activeModal === 'settings') return '设置与白名单';
@@ -133,6 +165,7 @@ export default function App() {
             <button className="icon-button" onClick={() => openModal('settings')} aria-label="打开设置" title="设置"><Settings size={18} /><span>设置</span></button>
           </nav>
         </header>
+        <NotificationDeniedBanner />
 
         <motion.div className={`workbench-grid ${settings.minimalMode ? 'minimal' : ''}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }}>
           <div className="workbench-main">

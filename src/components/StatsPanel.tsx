@@ -45,11 +45,11 @@ function reviewConclusion(params: { totalRecords: number; effectiveCount: number
 
 function nextActionSuggestion(params: { hasTasks: boolean; effectiveCount: number; ineffectiveCount: number; weeklyGap: number; topCategory?: string }) {
   const { hasTasks, effectiveCount, ineffectiveCount, weeklyGap, topCategory } = params;
-  if (!hasTasks) return '下一步：先添加一个今天要推进的具体任务，再开始第一轮专注。';
-  if (effectiveCount === 0 && ineffectiveCount > 0) return '下一步：把刚才的启动记录转化为完整轮次，先完成 1 个达到有效标准的番茄。';
-  if (effectiveCount === 0) return '下一步：选择当前任务，完成 1 个完整专注轮次，让今日统计产生可信样本。';
-  if (weeklyGap > 0) return `下一步：再安排 1-2 轮专注，优先推进${topCategory ? ` ${topCategory} 类` : ''}任务，距离本周基础目标还差 ${weeklyGap} 分钟。`;
-  return '下一步：本周基础目标已达成，建议复盘中断原因并归档已完成任务。';
+  if (!hasTasks) return '先别扩展计划。添加一个最小任务，完成一轮 25 分钟，让今天先有一个可靠推进点。';
+  if (effectiveCount === 0 && ineffectiveCount > 0) return '刚才已经启动过一次，但还没形成有效番茄。下一轮先减少干扰，完整跑完 1 个番茄。';
+  if (effectiveCount === 0) return '先选一个最具体的任务开始，不追求多任务，把第一轮完整跑完。';
+  if (weeklyGap > 0) return `今天已经有推进记录。接下来优先归档已完成任务，再安排 1 轮${topCategory ? ` ${topCategory} 类` : ''}任务；本周基础目标还差 ${weeklyGap} 分钟。`;
+  return '本周基础目标已达成。现在更适合回看中断原因，整理下一轮要推进的任务。';
 }
 export function StatsPanel() {
   const records = usePomodoroStore((state) => state.records);
