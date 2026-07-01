@@ -43,6 +43,7 @@ function TaskItem({ task, index, total, selected, locked, openMenuId, setOpenMen
   const [editing, setEditing] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuOpen = openMenuId === task.id;
+  const lockedTitle = locked ? '专注进行中，暂不可编辑任务。' : undefined;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -63,10 +64,8 @@ function TaskItem({ task, index, total, selected, locked, openMenuId, setOpenMen
   }, [menuOpen, setOpenMenuId]);
 
   const confirmDelete = () => {
-    if (window.confirm('删除任务只会移出当前任务列表，历史专注记录会保留用于统计。是否继续？')) {
-      deleteTask(task.id);
-      setOpenMenuId(null);
-    }
+    if (!locked) deleteTask(task.id);
+    setOpenMenuId(null);
   };
 
   return (
@@ -95,15 +94,15 @@ function TaskItem({ task, index, total, selected, locked, openMenuId, setOpenMen
         {task.status !== 'done' && <button className="task-action-primary" onClick={() => selectTask(task.id)} disabled={locked || selected}>设为当前</button>}
         {task.status !== 'done' && <button onClick={() => markTaskDone(task.id)} disabled={locked}>完成</button>}
         <div className="task-more" ref={menuRef}>
-          <button type="button" className="task-more-trigger" aria-expanded={menuOpen} aria-label="更多任务操作" title="更多任务操作" onClick={() => setOpenMenuId(menuOpen ? null : task.id)}>
+          <button type="button" className="task-more-trigger" aria-expanded={menuOpen} aria-label="更多任务操作" title={lockedTitle ?? '更多任务操作'} onClick={() => setOpenMenuId(menuOpen ? null : task.id)}>
             <MoreHorizontal size={16} /><span>更多</span>
           </button>
           {menuOpen && (
             <div className="task-more-menu" role="menu">
-              {task.status !== 'done' && <button role="menuitem" onClick={() => setEditing((value) => !value)} disabled={locked}><Pencil size={14} />{editing ? '收起编辑' : '编辑'}</button>}
-              {task.status !== 'done' && <button role="menuitem" onClick={() => reorderTask(task.id, -1)} disabled={index === 0 || locked}><ChevronUp size={14} />上移</button>}
-              {task.status !== 'done' && <button role="menuitem" onClick={() => reorderTask(task.id, 1)} disabled={index === total - 1 || locked}><ChevronDown size={14} />下移</button>}
-              <button role="menuitem" className="danger" onClick={confirmDelete} disabled={locked}><Trash2 size={14} />删除</button>
+              {task.status !== 'done' && <button role="menuitem" onClick={() => { setEditing((value) => !value); setOpenMenuId(null); }} disabled={locked} title={lockedTitle}><Pencil size={14} />{editing ? '收起编辑' : '编辑'}</button>}
+              {task.status !== 'done' && <button role="menuitem" onClick={() => { reorderTask(task.id, -1); setOpenMenuId(null); }} disabled={index === 0 || locked} title={lockedTitle}><ChevronUp size={14} />上移</button>}
+              {task.status !== 'done' && <button role="menuitem" onClick={() => { reorderTask(task.id, 1); setOpenMenuId(null); }} disabled={index === total - 1 || locked} title={lockedTitle}><ChevronDown size={14} />下移</button>}
+              <button role="menuitem" className="danger" onClick={confirmDelete} disabled={locked} title={lockedTitle}><Trash2 size={14} />删除</button>
             </div>
           )}
         </div>

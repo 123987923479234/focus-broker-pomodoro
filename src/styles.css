@@ -1782,7 +1782,7 @@
   .task-more-menu {
     position: absolute;
     right: 0;
-    z-index: 5;
+    z-index: 20;
     display: grid;
     min-width: 104px;
     gap: 5px;
@@ -2392,4 +2392,85 @@
     display: grid;
     grid-template-columns: 1fr;
   }
+}
+
+/* Modal */
+.danger-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  background: rgba(11, 18, 32, 0.28);
+  padding: 18px;
+  backdrop-filter: blur(5px);
+}
+
+.danger-confirm {
+  width: min(100%, 460px);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-radius: 18px;
+  background: var(--fb-surface-strong);
+  box-shadow: 0 22px 64px rgba(15, 23, 42, 0.16);
+  padding: 16px;
+}
+
+.danger-confirm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.danger-confirm-header h3 {
+  margin: 0;
+  color: var(--fb-text);
+  font-size: 17px;
+  font-weight: 760;
+}
+
+.danger-confirm-header p {
+  margin: 7px 0 0;
+  color: var(--fb-muted);
+  font-size: 13px;
+  font-weight: 560;
+  line-height: 1.6;
+}
+
+.danger-confirm-field {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+  color: var(--fb-muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.danger-confirm-field strong {
+  color: #b91c1c;
+  font-weight: 760;
+}
+
+.danger-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.danger-confirm-primary:not(:disabled) {
+  background: rgba(239, 68, 68, 0.10);
+}
+
+.dark .danger-confirm-backdrop {
+  background: rgba(2, 6, 23, 0.58);
+}
+
+.dark .danger-confirm {
+  background: rgba(15, 29, 50, 0.96);
+  border-color: rgba(248, 113, 113, 0.24);
+}
+
+.dark .danger-confirm-field strong {
+  color: #fca5a5;
 }
