@@ -1,10 +1,8 @@
 export function ScenicBackground() {
   return (
-    <div className="scenic-bg" aria-hidden="true">
-      <div className="scenic-scene default-focus-bg">
-        <div className="scene-vignette" />
-        <div className="scene-readability" />
-      </div>
+    <div className="fixed-focus-bg default-focus-bg" aria-hidden="true">
+      <div className="background-vignette" />
+      <div className="background-readability" />
     </div>
   );
 }

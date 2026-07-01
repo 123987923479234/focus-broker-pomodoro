@@ -41,6 +41,16 @@ function transaction<T>(db: IDBDatabase, mode: IDBTransactionMode, run: (store: 
   });
 }
 
+function batchTransaction(db: IDBDatabase, mode: IDBTransactionMode, run: (store: IDBObjectStore) => void) {
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, mode);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error ?? new Error('IndexedDB transaction aborted'));
+    run(tx.objectStore(STORE_NAME));
+  });
+}
+
 async function migrateLegacyRecordsIfNeeded() {
   if (legacyMigrationPromise) return legacyMigrationPromise;
   legacyMigrationPromise = (async () => {
@@ -51,9 +61,7 @@ async function migrateLegacyRecordsIfNeeded() {
     try {
       const legacyDb = await openNamedDB(LEGACY_DB_NAME);
       const legacyRecords = await transaction<PomodoroRecord[]>(legacyDb, 'readonly', (store) => store.getAll());
-      if (legacyRecords.length) {
-        await Promise.all(legacyRecords.map((record) => transaction(db, 'readwrite', (store) => store.put(record))));
-      }
+      if (legacyRecords.length) await savePomodoroRecords(legacyRecords);
       legacyDb.close();
     } catch {
       // 旧测试版数据库不存在或不可读时，直接使用新的 Focus Broker 数据库。
@@ -75,9 +83,21 @@ export async function listPomodoroRecords() {
 }
 
 export async function savePomodoroRecords(records: PomodoroRecord[]) {
+  if (!records.length) return;
   const db = await openPomodoroDB();
-  await Promise.all(records.map((record) => transaction(db, 'readwrite', (store) => store.put(record))));
+  await batchTransaction(db, 'readwrite', (store) => {
+    for (const record of records) store.put(record);
+  });
 }
+
+export async function replacePomodoroRecords(records: PomodoroRecord[]) {
+  const db = await openPomodoroDB();
+  await batchTransaction(db, 'readwrite', (store) => {
+    store.clear();
+    for (const record of records) store.put(record);
+  });
+}
+
 export async function clearPomodoroRecords() {
   const db = await openPomodoroDB();
   await transaction(db, 'readwrite', (store) => store.clear());

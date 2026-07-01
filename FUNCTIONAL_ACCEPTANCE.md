@@ -159,14 +159,15 @@
 - 支持导入 Focus Broker 导出的历史 JSON。
 - 文件 product 必须是 Focus Broker。
 - records 必须是数组。
-- 每条 record 至少包含 id、task、startedAt、endedAt、focusMs、review、energySeries 等关键字段。
+- 每条 record 至少包含 id、task、startedAt、endedAt、focusMs、review 等关键字段。
 - task.name 必须非空，task.category 和 task.difficulty 必须是支持值。
 - startedAt / endedAt / focusMs 必须是有效时间数据，endedAt 不能早于 startedAt。
 - review.completion、review.efficiency、review.energy 等字段会校验有效范围。
-- energySeries 必须是数组；无效精力点会被丢弃，合法点保留。
+- energySeries 如果存在必须是数组；无效精力点会被丢弃，合法点保留，并在导入提示中统计忽略数量。
 - 默认合并导入，按 record.id 去重。
 - id 重复时保留本地已有记录。
 - 覆盖导入使用应用内强确认，需要输入“导入覆盖”。
+- 覆盖导入使用单个 IndexedDB readwrite transaction 替换历史记录，失败时本地历史不应丢失。
 - 错误 JSON、错误 product、records 非数组、缺少 review、时间倒挂等情况会显示清楚错误提示，不静默失败。
 - 导入后 records 状态、今日复盘、近 7 天趋势和历史列表应同步刷新。
 - 导入功能只处理历史记录，不修改当前任务、当前计时器、设置和待复盘状态。
@@ -183,12 +184,29 @@
 8. 删除某条记录的 review，检查是否拒绝导入。
 9. 将某条记录 endedAt 改到 startedAt 之前，检查是否拒绝导入。
 10. 尝试覆盖导入，检查必须输入“导入覆盖”，导入后今日复盘、7 天趋势和历史列表同步刷新。
+11. 模拟覆盖导入失败，检查页面提示“覆盖导入失败，本地历史记录未被替换。”且本地 records 不被提前清空。
 
+
+### 12. 任务更多菜单
+
+状态：已实现基础交互，待移动端复测
+
+- 同时只允许一个任务更多菜单展开。
+- 点击菜单外部会关闭。
+- 按 Esc 会关闭。
+- 点击“编辑”后关闭菜单并展开编辑行。
+- 点击“上移 / 下移”后关闭菜单。
+- 点击“删除”后关闭菜单。
+- 专注进行中 locked 状态下，编辑、上移、下移、删除按钮禁用并显示提示：“专注进行中，暂不可编辑任务。”
+- 删除按钮使用 danger 样式。
+- 菜单 z-index 低于 Modal。
+- 移动端菜单不应溢出屏幕右侧。
 ## TODO / Issues
 
 - [TODO] 用真实 25 分钟完成一轮专注，验证自然到点、复盘弹出和短休息切换。
 - [TODO] 连续完成完整四轮，验证第 4 轮后进入长休息。
 - [TODO] 在 Chrome / Edge 中分别验证通知权限 denied 状态提示。
 - [TODO] 复测导出、合并导入、覆盖导入、清空历史记录和全部重置后的 UI 状态同步。
-- [TODO] 复测错误 product、records 非数组、缺少 review、时间倒挂等导入拒绝场景。
+- [TODO] 复测错误 product、records 非数组、缺少 review、时间倒挂、focusMs 不一致、review.energy 越界等导入拒绝场景。
+- [TODO] 复测任务更多菜单在移动端的边界位置和遮挡情况。
 - [TODO] 继续用真实任务数据校验近 7 天趋势、任务类型统计和平均精力口径。
